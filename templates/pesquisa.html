@@ -52,9 +52,9 @@
         }
     </script>
     <script>
-        function apagar(matricula, nome) {
+        function apagar(matricula) {
             if (confirm('Voce está certo disso?')) {
-                fetch(`/delete/${matricula}`, {
+                fetch(`/remover/${matricula}`, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())

@@ -55,6 +55,7 @@ def pesquisa_matricula():
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
 
 
+
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
     sentenciado = db.sentenciados.find_one({'matricula': matricula})
@@ -65,21 +66,29 @@ def adicionar_lista(matricula):
             'matricula': sentenciado['matricula'],
             'data_adicao': datetime.datetime.now()
         })
-        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
+        # Criar DataFrame com os dados
+        import pandas as pd
+        df = pd.DataFrame({
+            'nome': [sentenciado['nome']],
+            'matricula': [sentenciado['matricula']],
+            'data_adicao': datetime.datetime.now()
+        })
+        
+        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso', 'data': df.to_dict('records')})
     return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
-
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
     lista_selecionados = db.lista_selecionados.find()
     return render_template('lista.html', lista=lista_selecionados)
 
-@app.route('/apaga/<matricula>', methods=['DELETE'])
-def apagar(matricula):
-    sentenciado = db.sentenciados.find_one({'matricula': matricula})
-    if sentenciado:
-        db.lista_selecionados.delete_one({'matricula': matricula})
-        return jsonify({'status': 'success', 'message': 'Removido com sucesso'})
-    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+@app.route('/remover/<matricula>', methods=['DELETE'])
+def remover_lista(matricula):
+    resultado = db.lista_selecionados.delete_one({'matricula': matricula})
+    if resultado.deleted_count > 0:
+        return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+
 
 @app.route('/completa', methods=['GET'])
 def completa():
