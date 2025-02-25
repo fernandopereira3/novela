@@ -20,26 +20,16 @@ body {
 }
 
 /* Forms side by side */
-#pesquisa-form {
+.forms {
    width: 300px;
    padding: 20px;
    background-color: #fff;
    border-radius: 5px;
    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
    text-align: center;
+   line-height: 2.5;
    margin: 0 10px;
 }
-
-#valores-form {
-   width: 300px;
-   padding: 20px;
-   background-color: #fff;
-   border-radius: 5px;
-   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-   text-align: center;
-   margin: 0 10px;
-}
-
 /* Result below forms */
 .Resultado {
    display: block;

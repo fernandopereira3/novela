@@ -8,11 +8,11 @@
 </head>
 <body>
     <a href="/lista-selecionados">Ver Lista</a>
+    <div class="forms">
     <form method="POST" id="pesquisa-form">
         {{ form.csrf_token }}
         {{ form.matricula.label }} {{ form.matricula() }}
         {{ form.nome.label }} {{ form.nome() }}
-        {{ form.pesquisar() }}
     </form>
     <form action="POST" id="valores-form">
         {{ form.garrafas.label }} {{ form.garrafas() }}
@@ -20,6 +20,8 @@
         {{ form.mulheres.label }} {{ form.mulheres() }}
         {{ form.criancas.label }} {{ form.criancas() }}
     </form>
+    <p>{{ form.pesquisar() }}</p>
+    </div>
 
     <!-- Display search results -->
      <div class="Resultado">
