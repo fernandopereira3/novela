@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISTA</title>    
+    <link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
+</head>
+<body>
+    <a href="/lista-selecionados">Ver Lista</a>
+    <form method="POST" id="pesquisa-form">
+        {{ form.csrf_token }}
+        {{ form.matricula.label }} {{ form.matricula() }}
+        {{ form.nome.label }} {{ form.nome() }}
+        {{ form.pesquisar() }}
+    </form>
+    <form action="POST" id="valores-form">
+        {{ form.garrafas.label }} {{ form.garrafas() }}
+        {{ form.homens.label }} {{ form.homens() }}
+        {{ form.mulheres.label }} {{ form.mulheres() }}
+        {{ form.criancas.label }} {{ form.criancas() }}
+    </form>
+
+    <!-- Display search results -->
+     <div class="Resultado">
+        {% if sentenciados %}
+        <ul>
+            {% for sentenciado in sentenciados %}
+            <li>
+                {{ sentenciado.nome }} - {{ sentenciado.matricula }}
+                <button onclick="adicionarLista('{{ sentenciado.matricula }}')">Adicionar</button>
+                <button onclick="apagar('{{ sentenciado.matricula }}')" class="btn btn-danger">Apagar</button>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}  
+    </div>
+    <script>
+        function adicionarLista(matricula) {
+            fetch('/adicionar/' + matricula, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('Adicionado com sucesso');
+                }
+            });
+        }
+    </script>
+    <script>
+        function apagar(matricula, nome) {
+            if (confirm('Voce está certo disso?')) {
+                fetch(`/delete/${matricula}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erro ao apagar a matricula' + matricula);
+                });
+            }
+            else {
+                alert('Operação cancelada');
+            }
+        }
+        </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultados da Pesquisa</title>
+</head>
+<body>
+    <h1>Resultados</h1>
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>Data</th>
+            <th>Informações</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td>{{ result.Nome }}</td>
+            <td>{{ result.Data }}</td>
+            <td>{{ result.Informacoes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="/">Nova Pesquisa</a>
+</body>
+</html>
