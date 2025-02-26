@@ -6,6 +6,7 @@ import datetime
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
+import logging
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
@@ -29,6 +30,9 @@ class PesquisaForm(FlaskForm):
     mulheres = StringField('Mulheres')
     criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
+    
+class apagar(FlaskForm):
+    apagar = SubmitField('APAGAR LISTA')
 
 @app.route('/lista', methods=['GET',  'POST'])
 def pesquisa_matricula():
@@ -40,45 +44,41 @@ def pesquisa_matricula():
         matricula = form.matricula.data.strip()
         nome = form.nome.data.strip()
         query = {}
-
         if matricula:
             query['matricula'] = re.compile(f".*{matricula}.*", re.IGNORECASE)
         if nome:
             query['nome'] = {"$regex": nome,  "$options": "i"}
-
         resultados = list(sentenciados.find(query))
-
         for resultado in resultados:
             resultado['_id'] = str(resultado['_id'])
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
 
-
-
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
-    sentenciado = db.sentenciados.find_one({'matricula': matricula})
-    if sentenciado:
-        lista_selecionados = db.lista_selecionados
-        data = request.get_json()  # Get data from the request body
-
-        garrafas = data.get('garrafas', 0)
-        homens = data.get('homens', 0)
-        mulheres = data.get('mulheres', 0)
-        criancas = data.get('criancas', 0)
-
-        lista_selecionados.insert_one({
-            'nome': sentenciado['nome'],
-            'matricula': sentenciado['matricula'],
-            'garrafas': garrafas,  # Access values from the request data
-            'homens': homens,
-            'mulheres': mulheres,
-            'criancas': criancas,
-            'data_adicao': datetime.datetime.now()
-        })
-        
-        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
-    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+    logging.debug(f"Tentando adicionar matrícula: {matricula}")
+    try:
+        sentenciado = db.sentenciados.find_one({'matricula': matricula})
+        if sentenciado:
+            lista_selecionados = db.lista_selecionados
+            lista_selecionados.insert_one({
+                'nome': sentenciado['nome'],
+                'matricula': sentenciado['matricula'],
+                'garrafas': sentenciado.get('garrafas', ''),
+                'homens': sentenciado.get('homens', ''),
+                'mulheres': sentenciado.get('mulheres', ''),
+                'criancas': sentenciado.get('criancas', ''),
+                'data_adicao': datetime.datetime.now()
+            })
+            
+            logging.debug("Sentenciado adicionado à lista com sucesso.")
+            return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
+        else:
+            logging.warning(f"Matrícula não encontrada: {matricula}")
+            return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+    except Exception as e:
+        logging.error(f"Erro ao adicionar matrícula: {matricula}. Erro: {e}")
+        return jsonify({'status': 'error', 'message': str(e)})
 
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
@@ -93,12 +93,14 @@ def remover_lista(matricula):
     else:
         return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
-
-@app.route('/completa', methods=['GET'])
+@app.route('/del-lista', methods=['DELETE'])
 def completa():
-    resultado = db.sentenciados.find()
-    lista = list(resultado)
-    return jsonify(lista)
+    form = apagar()
+    resultado = db.lista_selecionados.delete_many({})
+    if resultado.deleted_count > 0:
+        return jsonify({'status': 'success', 'message': 'Todos os sentenciados foram removidos com sucesso'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Nenhum sentenciado encontrado para remover'})
 
 @app.route('/')
 def index():

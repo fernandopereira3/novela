@@ -13,7 +13,7 @@
         {{ form.csrf_token }}
         {{ form.matricula.label }} {{ form.matricula() }}
         {{ form.nome.label }} {{ form.nome() }}
-        <p>{{ form.pesquisar() }}</p>
+        <p>{{ form.pesquisar() }} {{ form.apagar() }}</p>
     </form>
     <form action="POST" id="valores-form">
         {{ form.garrafas.label }} {{ form.garrafas() }}
@@ -50,7 +50,13 @@
             .then(data => {
                 if(data.status === 'success') {
                     alert('Adicionado com sucesso');
+                } else {
+                    alert('Erro ao adicionar');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao adicionar a matricula ' + matricula);
             });
         }
     </script>
@@ -75,5 +81,26 @@
             }
         }
         </script>
+          <script>
+            function apagar_lista() {
+                if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA TODA A LISTA VOCE TEM CERTEZA?')) {
+                    fetch(`/del-lista`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Erro ao apagar a matricula' + matricula);
+                    });
+                }
+                else {
+                    alert('Operação cancelada');
+                }
+            }
+            </script>
 </body>
 </html>
