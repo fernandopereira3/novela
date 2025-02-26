@@ -1,30 +1,46 @@
 body {
    font-family: Arial, sans-serif;
+   font-size: 16px;
    background-color: #f2f2f2;
    margin: 0;
-   padding: 0;
    display: flex;
    flex-direction: column;
    align-items: center;
    min-height: 100vh;
 }
-
-.container {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   width: 100%;
-   max-width: 640px;
-   margin: 20px;
+a {
+	cursor: pointer;
+  transition: all 200ms linear;
 }
-
-.forms-container {
-   display: flex;
-   flex-direction: row;
-   justify-content: center;
-   width: 100%;
-   margin: 0 10px; /* Espaçamento lateral para centralizar */
+a:hover {
+	text-decoration: none;
 }
+.link {
+   color: #00ff15;
+ }
+ .link:hover {
+   color: red;
+ }
+
+#menu{
+   font-size: 20px;
+   width: 100%;
+   list-style-type: none;
+   background-color: #808080;
+   margin: 0;
+   padding: 5px;
+   border: 5px solid #808080;
+ }
+
+.button {
+   background-color: #04AA6D; /* Green */
+   border: black;
+   color: white;
+   padding: 2px;
+   text-align: center;
+   text-decoration: none;
+   font-size: 11px;
+ }
 
 .forms {
    width: 300px;
@@ -34,6 +50,10 @@ body {
    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
    line-height: 2.5;
    margin: 10px; /* Espaçamento para separar os formulários */
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   margin: 0 10px; /* Espaçamento lateral para centralizar */
 }
 #pesquisa-form{
    text-align: left;
@@ -48,18 +68,17 @@ body {
 
 .Resultado {
    display: flex;
-   width: 100%; /* Largura igual ao container */
+   width: 90%; /* Largura igual ao container */
    background-color: #fff;
    margin-top: 20px; /* Espaçamento superior */
    border-radius: 5px;
    text-align: left;
    line-height: 2.5;
-   padding: 20px;
 }
 
 #tabela-selecionados{
    display: block;
-   width: 100%; /* Largura igual ao container */
+   width: 90%; /* Largura igual ao container */
    background-color: #fff;
    margin-top: 20px; /* Espaçamento superior */
    border: 1;

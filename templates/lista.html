@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Lista de Selecionados</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISTA</title>    
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
 <body>
+    <ul id="menu">
+        <li><a href="/lista" class="link">Voltar</a></li>
+    </ul>
+    <br>
+    
+    </br>
     <h2>Lista de Selecionados</h2>
     <table id="tabela-selecionados">
         <tr>
@@ -28,6 +36,5 @@
         </tr>
         {% endfor %}
     </table>
-    <a href="/lista">Voltar para Pesquisa</a>
 </body>
 </html>
