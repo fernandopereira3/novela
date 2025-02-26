@@ -38,10 +38,9 @@ def pesquisa_matricula():
 
     if form.validate_on_submit():
         matricula = form.matricula.data.strip()
-        # matri_norm = re.sub(r'[\.\-]', '', matricula).strip()
         nome = form.nome.data.strip()
         query = {}
-        # re.compile(f".*{txt_d_pesquisa}.*", re.IGNORECASE)
+
         if matricula:
             query['matricula'] = re.compile(f".*{matricula}.*", re.IGNORECASE)
         if nome:
@@ -53,7 +52,6 @@ def pesquisa_matricula():
             resultado['_id'] = str(resultado['_id'])
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
-
 
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
