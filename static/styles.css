@@ -26,10 +26,8 @@ body {
    margin: 0 10px; /* Espaçamento lateral para centralizar */
 }
 
-
 .forms {
    width: 300px;
-   padding: 20px;
    background-color: #fff;
    border-radius: 5px;
    border: 1px solid black;
@@ -49,13 +47,14 @@ body {
 }
 
 .Resultado {
-   display: block;
+   display: flex;
    width: 100%; /* Largura igual ao container */
    background-color: #fff;
    margin-top: 20px; /* Espaçamento superior */
    border-radius: 5px;
    text-align: left;
    line-height: 2.5;
+   padding: 20px;
 }
 
 #tabela-selecionados{

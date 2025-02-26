@@ -4,39 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LISTA</title>    
-    <link rel="stylesheet" type= "text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
 <body>
-    <a href="/lista-selecionados">Ver Lista</a>
+    <p class="mb-0 mt-4 text-left"><a href="/lista-selecionados" class="link">Lista</a></p>
     <div class="forms">
-    <form method="POST" id="pesquisa-form">
-        {{ form.csrf_token }}
-        {{ form.matricula.label }} {{ form.matricula() }}
-        {{ form.nome.label }} {{ form.nome() }}
-        <p>{{ form.pesquisar() }} {{ form.apagar() }}</p>
-    </form>
-    <form action="POST" id="valores-form">
-        {{ form.garrafas.label }} {{ form.garrafas() }}
-        {{ form.homens.label }} {{ form.homens() }}
-        {{ form.mulheres.label }} {{ form.mulheres() }}
-        {{ form.criancas.label }} {{ form.criancas() }}
-    </form>
-   
+        <form method="POST" id="pesquisa-form">
+            {{ form.csrf_token }}
+            <p>{{ form.matricula.label }} {{ form.matricula() }}</p>
+            <p>{{ form.nome.label }} {{ form.nome() }}</p>
+        </form>
+        <form action="POST" id="valores-form">
+            <p>{{ form.garrafas.label }} {{ form.garrafas() }}</p>
+            <p>{{ form.homens.label }} {{ form.homens() }}</p>
+            <p>{{ form.mulheres.label }} {{ form.mulheres() }}</p>
+            {{ form.criancas.label }} {{ form.criancas() }}
+        </form>
+        <p>{{ form.pesquisar() }}</p>
     </div>
 
     <!-- Display search results -->
-     <div class="Resultado">
+    <div class="Resultado">
         {% if sentenciados %}
         <ul>
             {% for sentenciado in sentenciados %}
             <li>
                 {{ sentenciado.nome }} - {{ sentenciado.matricula }}
                 <button onclick="adicionarLista('{{ sentenciado.matricula }}')">Adicionar</button>
-                <button onclick="apagar('{{ sentenciado.matricula }}')" class="btn btn-danger">Apagar</button>
+                <button onclick="apagar('{{ sentenciado.matricula }}')" class="btn-danger">Apagar</button>
             </li>
             {% endfor %}
         </ul>
-        {% endif %}  
+        {% endif %}
     </div>
     <script>
         function adicionarLista(matricula) {
@@ -48,7 +47,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                if(data.status === 'success') {
+                if (data.status === 'success') {
                     alert('Adicionado com sucesso');
                 } else {
                     alert('Erro ao adicionar');
@@ -75,32 +74,30 @@
                     console.error('Error:', error);
                     alert('Erro ao apagar a matricula' + matricula);
                 });
-            }
-            else {
+            } else {
                 alert('Operação cancelada');
             }
         }
-        </script>
-          <script>
-            function apagar_lista() {
-                if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA TODA A LISTA VOCE TEM CERTEZA?')) {
-                    fetch(`/del-lista`, {
-                        method: 'DELETE'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Erro ao apagar a matricula' + matricula);
-                    });
-                }
-                else {
-                    alert('Operação cancelada');
-                }
+    </script>
+    <script>
+        function apagar_lista() {
+            if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA TODA A LISTA VOCE TEM CERTEZA?')) {
+                fetch(`/del-lista`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erro ao apagar a matricula' + matricula);
+                });
+            } else {
+                alert('Operação cancelada');
             }
-            </script>
+        }
+    </script>
 </body>
 </html>
