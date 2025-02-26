@@ -43,13 +43,13 @@
             const mulheres = prompt('Quantas mulheres?');
             const criancas = prompt('Quantas crianças?');
 
-            const data = {
+            const data = JSON.stringify({
                 matricula_nome: matricula + ' ' + nome,
                 garrafas: garrafas,
                 homens: homens,
                 mulheres: mulheres,
                 criancas: criancas
-            };
+            });
 
             fetch('/adicionar/' + matricula, {
                 method: 'POST',
@@ -61,7 +61,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Adicionado com sucesso');
+                    alert('Adicionado com sucesso' + matricula + ' ' + nome + ' ' + garrafas + ' ' + homens + ' ' + mulheres + ' ' + criancas);
                 } else {
                     alert('Erro ao adicionar a matricula ');
                 }
