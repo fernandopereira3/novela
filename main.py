@@ -25,10 +25,6 @@ except Exception as e:
 class PesquisaForm(FlaskForm):
     matricula = StringField('Matrícula')
     nome = StringField('Nome')
-    garrafas = StringField('Garrafas')
-    homens = StringField('Homens')
-    mulheres = StringField('Mulheres')
-    criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
     
 class apagar(FlaskForm):
@@ -64,10 +60,10 @@ def adicionar_lista(matricula):
             lista_selecionados.insert_one({
                 'nome': sentenciado['nome'],
                 'matricula': sentenciado['matricula'],
-                'garrafas': sentenciado.get('garrafas', ''),
-                'homens': sentenciado.get('homens', ''),
-                'mulheres': sentenciado.get('mulheres', ''),
-                'criancas': sentenciado.get('criancas', ''),
+                'garrafas': input("Informe o número de garrafas: "),
+                'homens': input("Informe o número de homens: "),
+                'mulheres': input("Informe o número de mulheres: "),
+                'criancas': input("Informe o número de crianças: "),
                 'data_adicao': datetime.datetime.now()
             })
             

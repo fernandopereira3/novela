@@ -18,10 +18,6 @@
             {{ form.csrf_token }}
             <p>{{ form.matricula.label }} {{ form.matricula() }}</p>
             <p>{{ form.nome.label }} {{ form.nome() }}</p>
-            <p>{{ form.garrafas.label }} {{ form.garrafas() }}</p>
-            <p>{{ form.homens.label }} {{ form.homens() }}</p>
-            <p>{{ form.mulheres.label }} {{ form.mulheres() }}</p>
-            <p>{{ form.criancas.label }} {{ form.criancas() }}</p>
             <button><p>{{ form.pesquisar() }}</p></button>
         </form>
     </div>
@@ -41,19 +37,33 @@
         {% endif %}
     </div>
     <script>
-        function adicionarLista(matricula) {
+        function adicionarLista(matricula, nome) {
+            const garrafas = prompt('Quantas garrafas?');
+            const homens = prompt('Quantos homens?');
+            const mulheres = prompt('Quantas mulheres?');
+            const criancas = prompt('Quantas crianças?');
+
+            const data = {
+                matricula_nome: matricula + ' ' + nome,
+                garrafas: garrafas,
+                homens: homens,
+                mulheres: mulheres,
+                criancas: criancas
+            };
+
             fetch('/adicionar/' + matricula, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     alert('Adicionado com sucesso');
                 } else {
-                    alert('Erro ao adicionar');
+                    alert('Erro ao adicionar a matricula ');
                 }
             })
             .catch(error => {
