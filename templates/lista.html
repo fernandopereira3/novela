@@ -5,21 +5,25 @@
 </head>
 <body>
     <h2>Lista de Selecionados</h2>
-    <table id="tabela-selecionados" border="1">
+    <table id="tabela-selecionados">
         <tr>
             <th>Nome</th>
             <th>Matrícula</th>
+            <th>Garrafas</th>
+            <th>Homens</th>
+            <th>Mulheres</th>
+            <th>Crianças</th>
             <th>Data Adição</th>
         </tr>
         {% for item in lista %}
         <tr>
             <td>{{ item.nome }}</td>
             <td>{{ item.matricula }}</td>
-            <td>{{ item.data_adicao.strftime('%d/%m/%Y %H:%M') }}</td>
             <td>{{ item.garrafas }}</td>
             <td>{{ item.homens }}</td>
             <td>{{ item.mulheres }}</td>
-            <td>{{ item.criancas }}</td>  
+            <td>{{ item.criancas }}</td>
+            <td>{{ item.data_adicao.strftime('%d/%m/%Y %H:%M') }}</td>
         </tr>
         {% endfor %}
     </table>

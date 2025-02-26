@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import os
 import re
@@ -54,26 +54,32 @@ def pesquisa_matricula():
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
 
 
+
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
     sentenciado = db.sentenciados.find_one({'matricula': matricula})
     if sentenciado:
         lista_selecionados = db.lista_selecionados
+        data = request.get_json()  # Get data from the request body
+
+        garrafas = data.get('garrafas', 0)
+        homens = data.get('homens', 0)
+        mulheres = data.get('mulheres', 0)
+        criancas = data.get('criancas', 0)
+
         lista_selecionados.insert_one({
             'nome': sentenciado['nome'],
             'matricula': sentenciado['matricula'],
-            'data_adicao': datetime.datetime.now()
-        })
-        # Criar DataFrame com os dados
-        import pandas as pd
-        df = pd.DataFrame({
-            'nome': [sentenciado['nome']],
-            'matricula': [sentenciado['matricula']],
+            'garrafas': garrafas,  # Access values from the request data
+            'homens': homens,
+            'mulheres': mulheres,
+            'criancas': criancas,
             'data_adicao': datetime.datetime.now()
         })
         
-        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso', 'data': df.to_dict('records')})
+        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
     return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
     lista_selecionados = db.lista_selecionados.find()

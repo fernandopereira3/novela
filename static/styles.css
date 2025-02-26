@@ -56,3 +56,13 @@ body {
    text-align: left;
    line-height: 2.5;
 }
+
+#tabela-selecionados{
+   display: block;
+   width: 100%; /* Largura igual ao container */
+   background-color: #fff;
+   margin-top: 20px; /* Espaçamento superior */
+   border: 1;
+   text-align: left;
+   line-height: 2.5;
+}
