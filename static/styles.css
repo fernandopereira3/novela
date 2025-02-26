@@ -9,8 +9,8 @@ body {
    min-height: 100vh;
 }
 a {
-	cursor: pointer;
-  transition: all 200ms linear;
+   cursor: pointer;
+   transition: all 200ms linear;
 }
 a:hover {
 	text-decoration: none;
@@ -42,41 +42,56 @@ a:hover {
    font-size: 11px;
  }
 
-.forms {
+#pesquisa-form{
    width: 300px;
    background-color: #fff;
-   border-radius: 5px;
+   border-radius: 10px;
    border: 1px solid black;
-   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   box-shadow: 14px 14px 20px #cbced1, -14px -14px 20px #cbced1;
    line-height: 2.5;
-   margin: 10px; /* Espaçamento para separar os formulários */
-   display: flex;
-   flex-direction: row;
    justify-content: center;
+   margin: 10px; /* Espaçamento para separar os formulários */
+   display: block;
+   float: left;
    margin: 0 10px; /* Espaçamento lateral para centralizar */
-}
-#pesquisa-form{
-   text-align: left;
    padding: 20px;
-   line-height: 2;
+   
 }
-#valores-form{
-   text-align: left;
-   padding: 20px;
-   line-height: 2;
+#fieldset-pesquisa{
+   padding: 10px;
+   margin: 5px;
+}
+#fieldset-volumes{
+   padding: 10px;
+   margin: 5px;
 }
 
-.Resultado {
+
+.Resultados {
    display: flex;
-   width: 90%; /* Largura igual ao container */
+   width: 50%; /* Largura igual ao container */
    background-color: #fff;
    margin-top: 20px; /* Espaçamento superior */
    border-radius: 5px;
-   text-align: left;
    line-height: 2.5;
+   padding: 20px;
 }
 
-#tabela-selecionados{
+#adicionar{
+   display: inline-block;
+}
+#adicionar:hover{
+   background-color: #00ff15;
+}
+
+#apagar{
+   display: inline-block;
+}
+#apagar:hover{
+   background-color: red;
+}
+
+#dataframe{
    display: block;
    width: 90%; /* Largura igual ao container */
    background-color: #fff;

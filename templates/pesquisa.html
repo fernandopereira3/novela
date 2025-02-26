@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LISTA</title>    
+    <title>Pesquisa de Sentenciados</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
 <body>
@@ -13,62 +13,71 @@
     <br>
     
     </br>
-    <div class="forms">
-        <form method="POST" id="pesquisa-form">
-            {{ form.csrf_token }}
-            <p>{{ form.matricula.label }} {{ form.matricula() }}</p>
-            <p>{{ form.nome.label }} {{ form.nome() }}</p>
-            <button><p>{{ form.pesquisar() }}</p></button>
+    <h1>Pesquisa de Sentenciados</h1>
+    <form method="POST" id="pesquisa-form">
+        {{ form.csrf_token }}
+        <form class="form-group">
+            <fieldset id="fieldset-pesquisa">
+                <p>{{ form.matricula.label }} {{ form.matricula(size=20) }}</p>
+                <p>{{ form.nome.label }} {{ form.nome(size=30) }}</p>
+           </fieldset>
+           <fieldset id="fieldset-volumes">
+            <p>{{ form.garrafas.label }} {{ form.garrafas(size=10) }}</p>
+            <p>{{ form.homens.label }} {{ form.homens(size=10) }}</p>
+            <p>{{ form.mulheres.label }} {{ form.mulheres(size=10) }}</p>
+            <p>{{ form.criancas.label }} {{ form.criancas(size=10) }}</p>
+            </fieldset>
+            <p>{{ form.pesquisar() }}</p>
         </form>
-    </div>
+    </form>
+    <br>
 
-    <!-- Display search results -->
-    <div class="Resultado">
-        {% if sentenciados %}
-        <ul>
-            {% for sentenciado in sentenciados %}
-            <li>
-                {{ sentenciado.nome }} - {{ sentenciado.matricula }}
-                <button onclick="adicionarLista('{{ sentenciado.matricula }}')">Adicionar</button>
-                <button onclick="apagar('{{ sentenciado.matricula }}')" class="btn-danger">Apagar</button>
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
+    </br>
+    {% if sentenciados %}
+        <table class="Resultados">
+            <tbody>
+                {% for sentenciado in sentenciados %}
+                    <tr>
+                        <td>{{ sentenciado['matricula'] }}</td>
+                        <td>{{ sentenciado['nome'] }}</td>
+                        <td>
+                            <button id="adicionar" onclick="adicionar('{{ sentenciado['matricula'] }}')">Adicionar</button>
+                            <button id="apagar" onclick="apagar('{{ sentenciado['matricula'] }}')">Remover</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    {% endif %}
     <script>
-        function adicionarLista(matricula, nome) {
-            const garrafas = prompt('Quantas garrafas?');
-            const homens = prompt('Quantos homens?');
-            const mulheres = prompt('Quantas mulheres?');
-            const criancas = prompt('Quantas crianças?');
-
-            const data = JSON.stringify({
-                matricula_nome: matricula + ' ' + nome,
-                garrafas: garrafas,
-                homens: homens,
-                mulheres: mulheres,
-                criancas: criancas
-            });
+        function adicionar(matricula) {
+            const garrafas = document.getElementById('garrafas').value;
+            const homens = document.getElementById('homens').value;
+            const mulheres = document.getElementById('mulheres').value;
+            const criancas = document.getElementById('criancas').value;
 
             fetch('/adicionar/' + matricula, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    garrafas: garrafas,
+                    homens: homens,
+                    mulheres: mulheres,
+                    criancas: criancas
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Adicionado com sucesso' + matricula + ' ' + nome + ' ' + garrafas + ' ' + homens + ' ' + mulheres + ' ' + criancas);
+                    alert('Adicionado com sucesso!');
+                    // Optionally, refresh the page or update the list
+                    window.location.href = '/lista-selecionados'; // Redirect to the list
                 } else {
-                    alert('Erro ao adicionar a matricula ');
+                    alert('Erro ao adicionar: ' + data.message);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Erro ao adicionar a matricula ' + matricula);
             });
         }
     </script>
@@ -93,9 +102,9 @@
         }
     </script>
     <script>
-        function apagar_lista() {
-            if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA TODA A LISTA VOCE TEM CERTEZA?')) {
-                fetch(`/del-lista`, {
+        function apagar_nome_lista(nome) {
+            if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA O NOME DA LISTA. VOCE TEM CERTEZA?')) {
+                fetch(`/del-nome-lista/${nome}`, {
                     method: 'DELETE'
                 })
                 .then(response => response.json())
@@ -105,7 +114,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Erro ao apagar a matricula' + matricula);
+                    alert('Erro ao apagar o nome da lista: ' + nome);
                 });
             } else {
                 alert('Operação cancelada');

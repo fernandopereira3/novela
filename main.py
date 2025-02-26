@@ -6,7 +6,6 @@ import datetime
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-import logging
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
@@ -15,7 +14,7 @@ app.config['SECRET_KEY'] = os.urandom(32)
 try:
     # Inicializa o PyMongo corretamente
     mongo = PyMongo(app)
-    db = mongo.db  
+    db = mongo.db
     mongo.db.command('ping')
     print("Conectado ao MongoDB com sucesso!")
 except Exception as e:
@@ -30,25 +29,28 @@ class PesquisaForm(FlaskForm):
     mulheres = StringField('Mulheres')
     criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
-    
-class apagar(FlaskForm):
-    apagar = SubmitField('APAGAR LISTA')
 
-@app.route('/lista', methods=['GET',  'POST'])
+# Initialize an empty DataFrame to store selected sentenciados
+selected_sentenciados_df = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+
+@app.route('/lista', methods=['GET', 'POST'])
 def pesquisa_matricula():
     form = PesquisaForm()
-    sentenciados = db.sentenciados 
+    sentenciados = db.sentenciados
     resultados = []
 
     if form.validate_on_submit():
         matricula = form.matricula.data.strip()
         nome = form.nome.data.strip()
         query = {}
+
         if matricula:
             query['matricula'] = re.compile(f".*{matricula}.*", re.IGNORECASE)
         if nome:
-            query['nome'] = {"$regex": nome,  "$options": "i"}
+            query['nome'] = {"$regex": nome, "$options": "i"}
+
         resultados = list(sentenciados.find(query))
+
         for resultado in resultados:
             resultado['_id'] = str(resultado['_id'])
 
@@ -56,47 +58,61 @@ def pesquisa_matricula():
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
-    logging.debug(f"Tentando adicionar matrícula: {matricula}")
-    try:
-        sentenciado = db.sentenciados.find_one({'matricula': matricula})
-        if sentenciado:
-            lista_selecionados = db.lista_selecionados
-            lista_selecionados.insert_one({
-                'nome': sentenciado['nome'],
-                'matricula': sentenciado['matricula'],
-                'data_adicao': datetime.datetime.now()
-            })
-            
-            logging.debug("Sentenciado adicionado à lista com sucesso.")
-            return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
-        else:
-            logging.warning(f"Matrícula não encontrada: {matricula}")
-            return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
-    except Exception as e:
-        logging.error(f"Erro ao adicionar matrícula: {matricula}. Erro: {e}")
-        return jsonify({'status': 'error', 'message': str(e)})
+    global selected_sentenciados_df  # Access the global DataFrame
+
+    sentenciado = db.sentenciados.find_one({'matricula': matricula})
+    if sentenciado:
+        data = request.get_json()  # Get data from the request body
+
+        garrafas = data.get('garrafas', 0)
+        homens = data.get('homens', 0)
+        mulheres = data.get('mulheres', 0)
+        criancas = data.get('criancas', 0)
+        data_adicao = datetime.datetime.now()
+
+        # Create a new row as a dictionary
+        new_row = {
+            'matricula': sentenciado['matricula'],
+            'nome': sentenciado['nome'],
+            'garrafas': garrafas,
+            'homens': homens,
+            'mulheres': mulheres,
+            'criancas': criancas,
+            'data_adicao': data_adicao
+        }
+
+        # Append the new row to the DataFrame
+        selected_sentenciados_df = pd.concat([selected_sentenciados_df, pd.DataFrame([new_row])], ignore_index=True)
+
+        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
+    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
-    lista_selecionados = db.lista_selecionados.find()
-    return render_template('lista.html', lista=lista_selecionados)
+    global selected_sentenciados_df  # Access the global DataFrame
+
+    # Convert DataFrame to HTML table
+    table_html = selected_sentenciados_df.to_html(index=False)
+
+    return render_template('lista.html', table=table_html)
 
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
-    resultado = db.lista_selecionados.delete_one({'matricula': matricula})
-    if resultado.deleted_count > 0:
-        return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
-    else:
-        return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+    global selected_sentenciados_df
 
-@app.route('/del-lista', methods=['DELETE'])
-def completa():
-    form = apagar()
-    resultado = db.lista_selecionados.delete_many({})
-    if resultado.deleted_count > 0:
-        return jsonify({'status': 'success', 'message': 'Todos os sentenciados foram removidos com sucesso'})
+    # Remove the row with the matching matricula from the DataFrame
+    selected_sentenciados_df = selected_sentenciados_df[selected_sentenciados_df['matricula'] != matricula]
+
+    if selected_sentenciados_df.empty:
+        return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
     else:
-        return jsonify({'status': 'error', 'message': 'Nenhum sentenciado encontrado para remover'})
+        return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
+
+@app.route('/completa', methods=['GET'])
+def completa():
+    resultado = db.sentenciados.find()
+    lista = list(resultado)
+    return jsonify(lista)
 
 @app.route('/')
 def index():

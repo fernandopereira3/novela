@@ -3,38 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LISTA</title>    
+    <title>Pesquisa de Sentenciados</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
 <body>
     <ul id="menu">
-        <li><a href="/lista" class="link">Voltar</a></li>
+        <li><a href="/lista" class="link">Pesquisa</a></li>
     </ul>
     <br>
     
     </br>
-    <h2>Lista de Selecionados</h2>
-    <table id="tabela-selecionados">
-        <tr>
-            <th>Nome</th>
-            <th>Matrícula</th>
-            <th>Garrafas</th>
-            <th>Homens</th>
-            <th>Mulheres</th>
-            <th>Crianças</th>
-            <th>Data Adição</th>
-        </tr>
-        {% for item in lista %}
-        <tr>
-            <td>{{ item.nome }}</td>
-            <td>{{ item.matricula }}</td>
-            <td>{{ item.garrafas }}</td>
-            <td>{{ item.homens }}</td>
-            <td>{{ item.mulheres }}</td>
-            <td>{{ item.criancas }}</td>
-            <td>{{ item.data_adicao.strftime('%d/%m/%Y %H:%M') }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <h1>Lista de Sentenciados Selecionados</h1>
+
+    {% if table %}
+        {{ table|safe }}
+    {% else %}
+        <p>Nenhum sentenciado selecionado.</p>
+    {% endif %}
+    <script>
+        function remover(matricula) {
+            // Implement the logic to remove the 'matricula' from the list
+            // This could be an AJAX call to the server
+            fetch('/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ matricula: matricula })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Sentenciado removido com sucesso:', data);
+                // Optionally, update the UI to reflect the removal
+            })
+            .catch((error) => {
+                console.error('Erro ao remover sentenciado:', error);
+            });
+        }
+    </script>
 </body>
 </html>
