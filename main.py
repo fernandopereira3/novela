@@ -31,7 +31,7 @@ class PesquisaForm(FlaskForm):
     pesquisar = SubmitField('PESQUISAR')
 
 # Initialize an empty DataFrame to store selected sentenciados
-selected_sentenciados_df = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
 
 @app.route('/lista', methods=['GET', 'POST'])
 def pesquisa_matricula():
@@ -58,11 +58,11 @@ def pesquisa_matricula():
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
-    global selected_sentenciados_df  # Access the global DataFrame
+    global df_lista_sentenciados
 
     sentenciado = db.sentenciados.find_one({'matricula': matricula})
     if sentenciado:
-        data = request.get_json()  # Get data from the request body
+        data = request.get_json()
 
         garrafas = data.get('garrafas', 0)
         homens = data.get('homens', 0)
@@ -70,7 +70,6 @@ def adicionar_lista(matricula):
         criancas = data.get('criancas', 0)
         data_adicao = datetime.datetime.now()
 
-        # Create a new row as a dictionary
         new_row = {
             'matricula': sentenciado['matricula'],
             'nome': sentenciado['nome'],
@@ -81,29 +80,28 @@ def adicionar_lista(matricula):
             'data_adicao': data_adicao
         }
 
-        # Append the new row to the DataFrame
-        selected_sentenciados_df = pd.concat([selected_sentenciados_df, pd.DataFrame([new_row])], ignore_index=True)
+        df_lista_sentenciados = pd.concat([df_lista_sentenciados, pd.DataFrame([new_row])], ignore_index=True)
 
         return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
     return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
-    global selected_sentenciados_df  # Access the global DataFrame
+    global df_lista_sentenciados  # Access the global DataFrame
 
     # Convert DataFrame to HTML table
-    table_html = selected_sentenciados_df.to_html(index=False)
+    tabela_html = df_lista_sentenciados.to_html(index=False)
 
-    return render_template('lista.html', table=table_html)
+    return render_template('lista.html', tabela=tabela_html)
 
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
-    global selected_sentenciados_df
+    global df_lista_sentenciados
 
     # Remove the row with the matching matricula from the DataFrame
-    selected_sentenciados_df = selected_sentenciados_df[selected_sentenciados_df['matricula'] != matricula]
+    df_lista_sentenciados = df_lista_sentenciados[df_lista_sentenciados['matricula'] != matricula]
 
-    if selected_sentenciados_df.empty:
+    if df_lista_sentenciados.empty:
         return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
     else:
         return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
