@@ -1,7 +1,7 @@
 body {
    font-family: Arial, sans-serif;
    font-size: 16px;
-   background-color: #f2f2f2;
+   background-color: #a3a2a2;
    margin: 0;
    display: flex;
    flex-direction: column;
@@ -23,6 +23,8 @@ a:hover {
  }
 
 #menu{
+   
+   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
    font-size: 20px;
    width: 100%;
    list-style-type: none;
@@ -43,15 +45,15 @@ a:hover {
  }
 
 #pesquisa-form{
-   width: 300px;
-   background-color: #fff;
+   font-weight: bold;
+   min-width: 400px;
+   min-height: 400px;
+   background-color: #a7a2a2;
    border-radius: 10px;
    border: 1px solid black;
-   box-shadow: 14px 14px 20px #cbced1, -14px -14px 20px #cbced1;
-   line-height: 2.5;
+   line-height: 1.5;
    justify-content: center;
    margin: 10px; /* Espaçamento para separar os formulários */
-   display: block;
    float: left;
    margin: 0 10px; /* Espaçamento lateral para centralizar */
    padding: 20px;
@@ -59,22 +61,26 @@ a:hover {
 }
 #fieldset-pesquisa{
    padding: 10px;
-   margin: 5px;
+   margin: 4px;
 }
 #fieldset-volumes{
    padding: 10px;
    margin: 5px;
 }
 
-
 .Resultados {
+   font-weight: bold;
    display: flex;
-   width: 50%; /* Largura igual ao container */
-   background-color: #fff;
+   width: 100%; /* Largura igual ao container */
+   background-color: #a7a2a2;
    margin-top: 20px; /* Espaçamento superior */
    border-radius: 5px;
    line-height: 2.5;
    padding: 20px;
+}
+
+.btn-dange:hover{
+   color: red;
 }
 
 #adicionar{

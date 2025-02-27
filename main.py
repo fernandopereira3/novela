@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, flash, redirect, url_for
 import pandas as pd
 import os
 import re
@@ -68,7 +68,7 @@ def adicionar_lista(matricula):
         homens = data.get('homens', 0)
         mulheres = data.get('mulheres', 0)
         criancas = data.get('criancas', 0)
-        data_adicao = datetime.datetime.now()
+        data_adicao = datetime.datetime.now().strftime("%d/%m/%Y as %H:%M")
 
         new_row = {
             'matricula': sentenciado['matricula'],
@@ -97,8 +97,7 @@ def visualizar_lista():
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
     global df_lista_sentenciados
-
-    # Remove the row with the matching matricula from the DataFrame
+    
     df_lista_sentenciados = df_lista_sentenciados[df_lista_sentenciados['matricula'] != matricula]
 
     if df_lista_sentenciados.empty:
@@ -106,11 +105,13 @@ def remover_lista(matricula):
     else:
         return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
 
-@app.route('/completa', methods=['GET'])
-def completa():
-    resultado = db.sentenciados.find()
-    lista = list(resultado)
-    return jsonify(lista)
+@app.route('/limpar_lista', methods=['POST'])
+def limpar_lista():
+    global df_lista_sentenciados
+
+    df_lista_sentenciados = pd.DataFrame(columns=df_lista_sentenciados.columns)
+    flash('Lista limpa com sucesso!', 'success')
+    return redirect(url_for('pesquisa_matricula'))
 
 @app.route('/')
 def index():

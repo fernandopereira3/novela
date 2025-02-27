@@ -27,7 +27,12 @@
             <p>{{ form.mulheres.label }} {{ form.mulheres(size=10) }}</p>
             <p>{{ form.criancas.label }} {{ form.criancas(size=10) }}</p>
             </fieldset>
-            <p>{{ form.pesquisar() }}</p>
+            <p>
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+                <button type="submit" class="btn-danger" formaction="{{ url_for('limpar_lista') }}" formmethod="post" onclick="return confirm('Tem certeza que deseja apagar toda a lista?');">
+                    <i class="fas fa-trash"></i> Limpar Lista
+                </button>
+            </p>
         </form>
     </form>
     <br>

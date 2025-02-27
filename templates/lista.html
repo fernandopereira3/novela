@@ -16,14 +16,37 @@
     <h1>Lista de Sentenciados com Visita</h1>
     
     {% if tabela %}
+        <style>
+            table {
+                width: 90%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+            th, td {
+                font: 1em arial;
+                font-weight: bold;
+                border: 1px solid #000000;
+                padding: 8px;
+                text-align: center;
+            }
+            th {
+                font-size: 1.2em;
+                background-color: #f2f2f2;
+                color: #333;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            tr:hover {
+                background-color: #f5f5f5;
+            }
+        </style>
         {{ tabela|safe }}
     {% else %}
         <p>Nenhum sentenciado selecionado.</p>
     {% endif %}
     <script>
         function remover(matricula) {
-            // Implement the logic to remove the 'matricula' from the list
-            // This could be an AJAX call to the server
             fetch('/remove', {
                 method: 'POST',
                 headers: {
@@ -34,7 +57,6 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Sentenciado removido com sucesso:', data);
-                // Optionally, update the UI to reflect the removal
             })
             .catch((error) => {
                 console.error('Erro ao remover sentenciado:', error);
