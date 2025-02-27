@@ -79,8 +79,9 @@ a:hover {
    padding: 20px;
 }
 
-.btn-dange:hover{
-   color: red;
+.btn-danger:hover{
+   color: white;
+   background-color: red;
 }
 
 #adicionar{
