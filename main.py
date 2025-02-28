@@ -87,12 +87,11 @@ def adicionar_lista(matricula):
 
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
-    global df_lista_sentenciados  # Access the global DataFrame
-
-    # Convert DataFrame to HTML table
+    global df_lista_sentenciados
     tabela_html = df_lista_sentenciados.to_html(index=False)
 
     return render_template('lista.html', tabela=tabela_html)
+
 
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
@@ -118,4 +117,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=80)
+    app.run(debug=True, port=81)
