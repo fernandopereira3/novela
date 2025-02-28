@@ -134,4 +134,5 @@ dmypy.json
 .pyre/
 
 *lib*
-*lib64
+*lib64*
+*cripts*
