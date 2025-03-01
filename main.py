@@ -1,11 +1,15 @@
-from flask import Flask, render_template, jsonify, request, flash, redirect, url_for
+from flask import Flask, render_template, jsonify, request, flash, redirect, url_for, send_file
 import pandas as pd
 import os
 import re
 import datetime
+import io
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
@@ -45,16 +49,74 @@ def pesquisa_matricula():
         query = {}
 
         if matricula:
-            query['matricula'] = re.compile(f".*{matricula}.*", re.IGNORECASE)
+            # This will match matricula regardless of leading/trailing spaces
+            query['matricula'] = {"$regex": f"^\\s*{re.escape(matricula)}\\s*$", "$options": "i"}
         if nome:
             query['nome'] = {"$regex": nome, "$options": "i"}
 
         resultados = list(sentenciados.find(query))
-
         for resultado in resultados:
             resultado['_id'] = str(resultado['_id'])
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
+
+
+
+@app.route('/download-pdf', methods=['GET'])
+def download_pdf():
+    global df_lista_sentenciados
+    
+    # Get sort parameter from query string
+    sort_by = request.args.get('sort', 'nome')
+    
+    # Sort the DataFrame
+    if sort_by in df_lista_sentenciados.columns:
+        df_sorted = df_lista_sentenciados.sort_values(by=sort_by)
+    else:
+        df_sorted = df_lista_sentenciados
+    
+    # Create a PDF in memory
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    
+    # Convert DataFrame to a list of lists for the table
+    data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
+    
+    # Create the table
+    table = Table(data)
+    
+    # Add style
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+    ])
+    table.setStyle(style)
+    
+    # Add the table to the elements
+    elements.append(table)
+    
+    # Build the PDF
+    doc.build(elements)
+    
+    # Reset buffer position to the beginning
+    buffer.seek(0)
+    
+    # Send the PDF as a downloadable file
+    current_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f'lista_sentenciados_{current_date}.pdf',
+        mimetype='application/pdf'
+    )
+
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
@@ -73,6 +135,7 @@ def adicionar_lista(matricula):
         new_row = {
             'matricula': sentenciado['matricula'],
             'nome': sentenciado['nome'],
+            'pavilhao': sentenciado['pavilhao'],
             'garrafas': garrafas,
             'homens': homens,
             'mulheres': mulheres,
@@ -112,9 +175,30 @@ def limpar_lista():
     flash('Lista limpa com sucesso!', 'success')
     return redirect(url_for('pesquisa_matricula'))
 
+@app.route('/clear', methods=['GET'])
+def clean_matricula_complete():
+    count = 0
+    for doc in db.sentenciados.find():
+        if 'matricula' in doc and isinstance(doc['matricula'], str):
+            original = doc['matricula']
+            
+            clean_matricula = original.replace(' ', '').replace('.', '').replace('-', '')
+            
+            if len(clean_matricula) > 0:
+                clean_matricula = clean_matricula[:-1]
+            
+            if clean_matricula != original:
+                db.sentenciados.update_one(
+                    {'_id': doc['_id']},
+                    {'$set': {'matricula': clean_matricula}}
+                )
+                count += 1
+    
+    return f"Cleaned {count} matricula records by removing spaces, periods, hyphens, and the last digit"
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=81)
+    app.run( host='0.0.0.0' , debug=True, port=80 )

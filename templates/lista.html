@@ -41,6 +41,7 @@
                 width: 90%;
                 border-collapse: collapse;
                 margin: 20px 0;
+                transform: translateX(5%);
             }
             th, td {
                 font: 1em arial;
@@ -82,6 +83,17 @@
                 console.error('Erro ao remover sentenciado:', error);
             });
         }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+            $(document).ready(function() {
+                // Handle sorting change
+            $('#sortSelect').change(function() {
+                let sortBy = $(this).val();
+                window.location.href = '{{ url_for("visualizar_lista") }}?sort=' + sortBy;
+            });
+        });
     </script>
 
     <div class="footer">
