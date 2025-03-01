@@ -62,7 +62,7 @@ def pesquisa_matricula():
 
 
 
-@app.route('/download-pdf', methods=['GET'])
+@app.route('/download', methods=['GET'])
 def download_pdf():
     global df_lista_sentenciados
     
@@ -93,7 +93,7 @@ def download_pdf():
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ])
@@ -201,4 +201,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=81)
+    app.run(host='0.0.0.0', port=80)

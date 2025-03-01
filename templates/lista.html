@@ -36,7 +36,6 @@
     <h1>Lista de Sentenciados com Visita</h1>
     
     {% if tabela %}
-<<<<<<< HEAD
         <style>
             table {
                 width: 90%;
@@ -64,17 +63,10 @@
             }
         </style>
         {{ tabela|safe }}
-=======
-        <div class="table-container">
-            <table class="styled-table">
-                {{ tabela|safe }}
-            </table>
-        </div>
->>>>>>> 5e8e36313367e434a3934a110259108bf8d01637
     {% else %}
         <p>Nenhum sentenciado selecionado.</p>
     {% endif %}    
-    
+    <a href="/download" class="btn-download">Baixar Lista</a>
     <script>
         function remover(matricula) {
             fetch('/remove', {
