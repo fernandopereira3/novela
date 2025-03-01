@@ -34,9 +34,8 @@ class PesquisaForm(FlaskForm):
     criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
 
-# Initialize an empty DataFrame to store selected sentenciados
+# Inicializa um DataFrame vazio para armazenar sentenciados selecionados
 df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
-
 @app.route('/lista', methods=['GET', 'POST'])
 def pesquisa_matricula():
     form = PesquisaForm()
@@ -49,7 +48,6 @@ def pesquisa_matricula():
         query = {}
 
         if matricula:
-            # This will match matricula regardless of leading/trailing spaces
             query['matricula'] = {"$regex": f"^\\s*{re.escape(matricula)}\\s*$", "$options": "i"}
         if nome:
             query['nome'] = {"$regex": nome, "$options": "i"}
@@ -66,27 +64,21 @@ def pesquisa_matricula():
 def download_pdf():
     global df_lista_sentenciados
     
-    # Get sort parameter from query string
     sort_by = request.args.get('sort', 'nome')
     
-    # Sort the DataFrame
     if sort_by in df_lista_sentenciados.columns:
         df_sorted = df_lista_sentenciados.sort_values(by=sort_by)
     else:
         df_sorted = df_lista_sentenciados
     
-    # Create a PDF in memory
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
     
-    # Convert DataFrame to a list of lists for the table
     data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
     
-    # Create the table
     table = Table(data)
     
-    # Add style
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -98,17 +90,13 @@ def download_pdf():
         ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ])
     table.setStyle(style)
-    
-    # Add the table to the elements
+
     elements.append(table)
     
-    # Build the PDF
     doc.build(elements)
     
-    # Reset buffer position to the beginning
     buffer.seek(0)
     
-    # Send the PDF as a downloadable file
     current_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     return send_file(
         buffer,
