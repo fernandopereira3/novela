@@ -9,7 +9,7 @@
 <body>
     <div class="header">
         <img src="../static/img/penla.png" alt="Logo">
-        <h1><a href="/">Sistema de alguma coisa que eu nao pensei ainda...</a></h1>
+        <h1><a href="/">Sistema</a></h1>
     </div>
     <nav class="nav-tabs">
         <ul>
@@ -34,7 +34,14 @@
     
     </br>
     <h1>Lista de Sentenciados com Visita</h1>
-    
+    <nav class="nav-btn">
+        <ul>
+            <li>
+                <a href="/download">Baixar Lista</a>
+            </li>
+        </ul>
+    </nav>
+   
     {% if tabela %}
         <style>
             table {
@@ -66,7 +73,6 @@
     {% else %}
         <p>Nenhum sentenciado selecionado.</p>
     {% endif %}    
-    <a href="/download" class="btn-download">Baixar Lista</a>
     <script>
         function remover(matricula) {
             fetch('/remove', {
@@ -96,11 +102,5 @@
             });
         });
     </script>
-
-    <div class="footer">
-        <div class="container">
-            <p>© Fernando Pereira 2025</p>
-        </div>
-    </div>
 </body>
 </html>
