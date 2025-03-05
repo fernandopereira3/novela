@@ -128,6 +128,7 @@ body {
    text-decoration: none;
    padding: 10px 10px;
    transform: translateY(-10%);
+   transform: translateX(10%);
 }
 
 .nav-btn li a:hover{
@@ -138,7 +139,30 @@ body {
    text-decoration: none;
    padding: 10px 10px;
    transform: translateY(-10%);
+   transform: translateX(10%);
  }
+
+ .nav-contados{
+   position: relative;
+   left: 10px;
+   transform: translateY(-10%);
+ }
+
+ .nav-contados li{
+   display: inline-block;
+   height: 30px;
+}
+
+.nav-contados li a{
+   background-color: #004a8d;
+   border-radius: 15px;
+   display: inline-block;
+   color: white;
+   text-decoration: none;
+   padding: 10px 10px;
+   transform: translateY(-10%);
+}
+
 
                                                          /* BTNs */
 .btn-adicionar {
@@ -261,7 +285,7 @@ fieldset>legend{
    border-radius: 10px;
    border: 1px solid black;
    line-height: 1.5;
-   margin: 10px auto; /* Centraliza horizontalmente */
+   margin: 10px auto;
    padding: 20px;
 }
 
@@ -276,4 +300,3 @@ fieldset>legend{
    background-color: #8d0000;
    color: white;
 }
-

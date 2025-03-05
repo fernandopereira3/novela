@@ -7,6 +7,8 @@ import io
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
@@ -15,8 +17,8 @@ app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
 app.config['SECRET_KEY'] = os.urandom(32)
 
+# Inicializa o PyMongo corretamente
 try:
-    # Inicializa o PyMongo corretamente
     mongo = PyMongo(app)
     db = mongo.db
     mongo.db.command('ping')
@@ -33,6 +35,7 @@ class PesquisaForm(FlaskForm):
     mulheres = StringField('Mulheres')
     criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
+
 
 # Inicializa um DataFrame vazio para armazenar sentenciados selecionados
 df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
@@ -75,6 +78,29 @@ def download_pdf():
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
     
+    # Calculate totals
+    totals = {
+        'garrafas': df_lista_sentenciados['garrafas'].fillna(0).astype(int).sum(),
+        'homens': df_lista_sentenciados['homens'].fillna(0).astype(int).sum(),
+        'mulheres': df_lista_sentenciados['mulheres'].fillna(0).astype(int).sum(),
+        'criancas': df_lista_sentenciados['criancas'].fillna(0).astype(int).sum()    
+        }
+    
+    
+    # Add totals information
+   
+    
+    styles = getSampleStyleSheet()
+    
+    # Create a summary section
+    elements.append(Paragraph("Resumo:", styles['Heading2']))
+    elements.append(Paragraph(f"Total de Garrafas: {totals['garrafas']}", styles['Normal']))
+    elements.append(Paragraph(f"Total de Homens: {totals['homens']}", styles['Normal']))
+    elements.append(Paragraph(f"Total de Mulheres: {totals['mulheres']}", styles['Normal']))
+    elements.append(Paragraph(f"Total de Crianças: {totals['criancas']}", styles['Normal']))
+    elements.append(Paragraph(" ", styles['Normal']))  # Spacing
+    
+    # Add the table data
     data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
     
     table = Table(data)
@@ -136,12 +162,23 @@ def adicionar_lista(matricula):
         return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
     return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
+
+
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
     global df_lista_sentenciados
+    
+    # Calculate totals
+    totals = {
+        'garrafas': df_lista_sentenciados['garrafas'].fillna(0).astype(int).sum(),
+        'homens': df_lista_sentenciados['homens'].fillna(0).astype(int).sum(),
+        'mulheres': df_lista_sentenciados['mulheres'].fillna(0).astype(int).sum(),
+        'criancas': df_lista_sentenciados['criancas'].fillna(0).astype(int).sum()    
+        }
+    
     tabela_html = df_lista_sentenciados.to_html(index=False)
 
-    return render_template('lista.html', tabela=tabela_html)
+    return render_template('lista.html', tabela=tabela_html, totals=totals)
 
 
 @app.route('/remover/<matricula>', methods=['DELETE'])
