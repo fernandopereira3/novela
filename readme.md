@@ -91,7 +91,7 @@ Before installation, ensure you have:
    python app.py
    ```
 
-6. Access the application at `http://localhost:5000` in your web browser
+6. Access the application at `http://localhost:80` in your web browser
 
 ## 🚀 Usage
 
@@ -227,7 +227,7 @@ Antes da instalação, certifique-se de ter:
    python app.py
    ```
 
-6. Acesse a aplicação em `http://localhost:5000` no seu navegador
+6. Acesse a aplicação em `http://localhost:80` no seu navegador
 
 ## Uso
 
