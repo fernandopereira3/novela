@@ -38,6 +38,14 @@ A robust web-based solution for efficiently managing, searching, and organizing 
   - MongoDB integration for reliable data storage
   - Efficient data retrieval and management
 
+- **PIP error**:
+  - This error is because the pip command is not recognized.
+  - To fix this error, you need to install the pip package.
+  - You can install the pip package with the command:
+  ```bash
+  sudo apt-get install python3-pip
+  ```
+
 ## 🏗️ Architecture
 
 This application follows a simple MVC (Model-View-Controller) architecture:
