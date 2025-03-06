@@ -169,13 +169,22 @@ def visualizar_lista():
     global df_lista_sentenciados
     
     # Calculate totals
-    totals = {
-        'garrafas': df_lista_sentenciados['garrafas'].fillna(0).astype(int).sum(),
-        'homens': df_lista_sentenciados['homens'].fillna(0).astype(int).sum(),
-        'mulheres': df_lista_sentenciados['mulheres'].fillna(0).astype(int).sum(),
-        'criancas': df_lista_sentenciados['criancas'].fillna(0).astype(int).sum()    
+    try:
+        totals = {
+            'garrafas': sum(df_lista_sentenciados['garrafas']),
+            'homens': sum(df_lista_sentenciados['homens']),
+            'mulheres': sum(df_lista_sentenciados['mulheres']),
+            'criancas': sum(df_lista_sentenciados['criancas'])
         }
-    
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        totals = {
+            'garrafas': 0,
+            'homens': 0,
+            'mulheres': 0,
+            'criancas': 0
+        }
+
     tabela_html = df_lista_sentenciados.to_html(index=False)
 
     return render_template('lista.html', tabela=tabela_html, totals=totals)
