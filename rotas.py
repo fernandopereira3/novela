@@ -40,17 +40,12 @@ def download_pdf():
     global df_lista_sentenciados
     
     sort_by = request.args.get('sort', 'nome')
-    
-    if sort_by in df_lista_sentenciados.columns:
-        df_sorted = df_lista_sentenciados.sort_values(by=sort_by)
-    else:
-        df_sorted = df_lista_sentenciados
+    df_sorted = df_lista_sentenciados.sort_values(by=sort_by) if sort_by in df_lista_sentenciados.columns else df_lista_sentenciados
     
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=20, rightMargin=20, topMargin=20, bottomMargin=20)
     elements = []
     
-    # Calculate totals
     try:
         totals = {
             'garrafas': df_lista_sentenciados['garrafas'].replace('', pd.NA).fillna(0).astype(int).sum(),
@@ -59,54 +54,62 @@ def download_pdf():
             'criancas': df_lista_sentenciados['criancas'].replace('', pd.NA).fillna(0).astype(int).sum()
         }
     except Exception as e:
-        print(f"Error: {str(e)}")
-        totals = {
-            'garrafas': 0,
-            'homens': 0,
-            'mulheres': 0,
-            'criancas': 0
-        }
-   
-    styles = getSampleStyleSheet()
-    
-    # Create a summary section
-    elements.append(Paragraph("Resumo:", styles['Heading2']))
-    elements.append(Paragraph(f"Total de Garrafas: {totals['garrafas']}", styles['Normal']))
-    elements.append(Paragraph(f"Total de Homens: {totals['homens']}", styles['Normal']))
-    elements.append(Paragraph(f"Total de Mulheres: {totals['mulheres']}", styles['Normal']))
-    elements.append(Paragraph(f"Total de Crianças: {totals['criancas']}", styles['Normal']))
-    elements.append(Paragraph(" ", styles['Normal']))  # Spacing
-    
-    # Add the table data
+        totals = {'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
+
     data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
-    
-    table = Table(data)
+    table = Table(data, colWidths=[50, 100, 40, 40, 40, 40, 70])
     
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('TOPPADDING', (0, 0), (-1, 0), 8),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
     ])
+    
     table.setStyle(style)
 
+    summary_data = [
+        ['Resumo', 'Total'],
+        ['Garrafas', str(totals['garrafas'])],
+        ['Homens', str(totals['homens'])],
+        ['Mulheres', str(totals['mulheres'])],
+        ['Crianças', str(totals['criancas'])]
+    ]
+    
+    summary_table = Table(summary_data, colWidths=[60, 60])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+    ]))
+
     elements.append(table)
+    elements.append(Paragraph("<br/>", getSampleStyleSheet()['Normal']))
+    elements.append(summary_table)
+    elements.append(Paragraph("<br/>_____________________________<br/>Assinatura do Responsável", getSampleStyleSheet()['Normal']))
     
     doc.build(elements)
-    
     buffer.seek(0)
     
-    current_date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     return send_file(
         buffer,
         as_attachment=True,
-        download_name=f'lista_sentenciados_{current_date}.pdf',
+        download_name=f'lista_{datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")}.pdf',
         mimetype='application/pdf'
     )
+
 
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
