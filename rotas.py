@@ -43,7 +43,7 @@ def download_pdf():
     df_sorted = df_lista_sentenciados.sort_values(by=sort_by) if sort_by in df_lista_sentenciados.columns else df_lista_sentenciados
     
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=20, rightMargin=20, topMargin=20, bottomMargin=20)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=15, rightMargin=15, topMargin=20, bottomMargin=20)
     elements = []
     
     try:
@@ -57,22 +57,25 @@ def download_pdf():
         totals = {'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
 
     data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
-    table = Table(data, colWidths=[50, 100, 40, 40, 40, 40, 70])
+    table_nomes = Table(data, colWidths=[70, 180, 35, 35, 35, 35, 90])
     
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
         ('TOPPADDING', (0, 0), (-1, 0), 8),
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
         ('BOX', (0, 0), (-1, -1), 1, colors.black),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('WORDWRAP', (0, 0), (-1, -1), True),
+        ('ALIGN', (2, 1), (-2, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
     ])
     
-    table.setStyle(style)
+    table_nomes.setStyle(style)
 
     summary_data = [
         ['Resumo', 'Total'],
@@ -95,10 +98,10 @@ def download_pdf():
         ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
     ]))
 
-    elements.append(table)
-    elements.append(Paragraph("<br/>", getSampleStyleSheet()['Normal']))
+    elements.append(table_nomes)
+    elements.append(Paragraph("<br/><br/><br/>", getSampleStyleSheet()['Normal']))
     elements.append(summary_table)
-    elements.append(Paragraph("<br/>_____________________________<br/>Assinatura do Responsável", getSampleStyleSheet()['Normal']))
+    elements.append(Paragraph("<br/><br/><br/>_____________________________<br/>Assinatura do Responsável", getSampleStyleSheet()['Normal']))
     
     doc.build(elements)
     buffer.seek(0)
@@ -109,7 +112,6 @@ def download_pdf():
         download_name=f'lista_{datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")}.pdf',
         mimetype='application/pdf'
     )
-
 
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
