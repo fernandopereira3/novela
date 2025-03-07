@@ -142,18 +142,18 @@ body {
    transform: translateX(10%);
  }
 
- .nav-contados{
+ .nav-conta{
    position: relative;
    left: 10px;
    transform: translateY(-10%);
  }
 
- .nav-contados li{
+ .nav-conta li{
    display: inline-block;
    height: 30px;
 }
 
-.nav-contados li a{
+.nav-conta li a{
    background-color: #004a8d;
    border-radius: 15px;
    display: inline-block;
@@ -161,6 +161,10 @@ body {
    text-decoration: none;
    padding: 10px 10px;
    transform: translateY(-10%);
+}
+
+.nav-conta label{
+   font-weight: bolder;
 }
 
 
