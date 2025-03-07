@@ -2,13 +2,16 @@ version: '3'
 
 services:
   app:
+    image: pyhton
     build: .
     ports:
       - "5000:5000"
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/novela
+      - MONGODB_URI=mongodb://mongodb:27017/cpppac
     depends_on:
       - mongodb
+    networks:
+      - app-network
 
   mongodb:
     image: mongo:latest
@@ -16,6 +19,15 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_DATABASE=cpppac
+
 
 volumes:
   mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge

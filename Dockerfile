@@ -1,14 +1,10 @@
-FROM ubuntu:latest
-
-
+FROM python
 WORKDIR /app
-
 COPY . .
-
 EXPOSE 8000
+RUN pip install -r requirements.txt
+CMD ["python", "main.py"]
 
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && 
+FROM mongodb:latest
 
-CMD ["python", "app.py"]
 
