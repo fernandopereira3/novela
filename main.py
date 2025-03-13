@@ -6,7 +6,7 @@ from wtforms import StringField, SubmitField
 
 
 app = Flask(__name__, instance_relative_config=True)
-app.config['MONGO_URI'] = 'mongodb://mongod:27017/cpppac'
+app.config['MONGO_URI'] = 'mongodb://db-novela:27017/cpppac'
 app.config['SECRET_KEY'] = os.urandom(32)
 
 # Inicializa o PyMongo corretamente

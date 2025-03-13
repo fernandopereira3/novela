@@ -1,10 +1,17 @@
-FROM python
-WORKDIR /app
-COPY . .
-EXPOSE 8000
-RUN pip install -r requirements.txt
-CMD ["python", "main.py"]
+FROM fedora:latest
 
-FROM mongodb:latest
+WORKDIR /novela
+
+# Copy application files
+COPY . .
+RUN dnf update  -y
+RUN dnf install python313 -y
+RUN dnf install python3-pip -y
+RUN cd /novela
+RUN python3 -m venv .
+RUN python3 -m pip install -r requirements.txt
+
+# Run the application
+CMD ["python3", "main.py"]
 
 

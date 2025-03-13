@@ -2,12 +2,13 @@ version: '3'
 
 services:
   app:
-    image: pyhton
+    image: fedora:latest
+    container_name: app-novela
     build: .
     ports:
       - "5000:5000"
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/cpppac
+      - MONGODB_URI=mongodb://db-novela:27017/cpppac
     depends_on:
       - mongodb
     networks:
@@ -15,14 +16,12 @@ services:
 
   mongodb:
     image: mongo:latest
+    container_name: db-novela
     ports:
-      - "27017:27017"
+      - 27017:27017
     volumes:
-      - mongodb_data:/data/db
-    networks:
-      - app-network
-    environment:
-      - MONGO_INITDB_DATABASE=cpppac
+      - /db:/db
+    restart: always
 
 
 volumes:
