@@ -6,7 +6,7 @@ from wtforms import StringField, SubmitField
 
 
 app = Flask(__name__, instance_relative_config=True)
-app.config['MONGO_URI'] = 'mongodb://db-novela:27017/cpppac'
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
 app.config['SECRET_KEY'] = os.urandom(32)
 
 # Inicializa o PyMongo corretamente
@@ -30,6 +30,7 @@ class PesquisaForm(FlaskForm):
 
 
 from rotas import *
+from rotas_saida import *
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -150,7 +150,6 @@ def adicionar_lista(matricula):
 def visualizar_lista():
     global df_lista_sentenciados
     try:
-        # Replace empty strings with NaN, then fill NaN with 0 before converting to int
         totals = {
             'garrafas': df_lista_sentenciados['garrafas'].replace('', pd.NA).fillna(0).astype(int).sum(),
             'homens': df_lista_sentenciados['homens'].replace('', pd.NA).fillna(0).astype(int).sum(),
@@ -181,6 +180,7 @@ def remover_lista(matricula):
         return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
     else:
         return jsonify({'status': 'success', 'message': 'Matrícula removida com sucesso'})
+    
 
 @app.route('/limpar_lista', methods=['POST'])
 def limpar_lista():

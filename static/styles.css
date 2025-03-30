@@ -234,6 +234,11 @@ body {
    border: #004a8d;
 }
 
+.bnt-ini-saida:hover{
+   background-color: red;
+   border: red;
+}
+
 
                                                             /* Footer */
 .footer {
