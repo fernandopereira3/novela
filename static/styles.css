@@ -109,9 +109,7 @@ body {
 }
                                                          /* NAV BTN */
 
-.nav-bnt {
-   background-color: #333;
-   border-bottom: 1px solid #dee2e6;
+.nav-btn {
    height: 30px;
 }
 
@@ -132,7 +130,7 @@ body {
 }
 
 .nav-btn li a:hover{
-   background-color: #248d35;
+   background-color: rgb(183, 42, 42);
    border-radius: 15px;
    display: inline-block;
    color: white;
@@ -233,12 +231,6 @@ body {
    background-color: #004a8d;
    border: #004a8d;
 }
-
-.bnt-ini-saida:hover{
-   background-color: red;
-   border: red;
-}
-
 
                                                             /* Footer */
 .footer {

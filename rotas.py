@@ -11,6 +11,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from main import app, db, PesquisaForm
 
 df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+
 @app.route('/lista', methods=['GET', 'POST'])
 def pesquisa_matricula():
     form = PesquisaForm()
@@ -209,7 +210,16 @@ def clean_matricula_complete():
                 )
                 count += 1
     
-    return f"Cleaned {count} matricula records by removing spaces, periods, hyphens, and the last digit"
+    return f"LIMPO ! FORAM REMOVIDOS ESPACOS, PONTOS E O DIGITO DE {count} MATRICULAS"
+
+
+@app.route('/btn-saida', methods=['GET'])
+def iniciar_saida():
+    global df_lista_sentenciados
+    current_hour = datetime.datetime.now().hour
+    if current_hour < 14:
+        return jsonify({'message': 'Este recurso so pode ser usado apos as 14:00 horas'})
+
 
 @app.route('/')
 def index():
