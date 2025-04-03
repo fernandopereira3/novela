@@ -53,3 +53,5 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/novela:${{github.run_number}}
+
+#PARA CONSERTAR O HUB DO DOCKER !
