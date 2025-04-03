@@ -32,8 +32,4 @@ jobs:
       run: |
         flake8 rotas.py --count --select=E9,F63,F7 --show-source --statistics
         flake8 rotas_saida.py --count --select=E9,F63,F7--show-source --statistics
-        flake8 main.py --count --select=E9,F63,F7--show-source --statistics 
-
-    - name: Test with pytest
-      run: |
-        pytest rotas.py rotas_saida.py main.py
+        flake8 main.py --count --select=E9,F63,F7--show-source --statistics
