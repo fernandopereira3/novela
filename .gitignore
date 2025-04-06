@@ -29,7 +29,6 @@ etc/
 share/
 bin/
 *.cfg
-*.csv
 MANIFEST
 
 # PyInstaller
@@ -137,5 +136,3 @@ dmypy.json
 *lib64*
 *cript*
 *cripts*
-*.csv
-*DS_Store*
