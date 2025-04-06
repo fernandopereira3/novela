@@ -3,7 +3,7 @@ FROM mongo:latest
 
 WORKDIR /db
 
-COPY db.csv .
+COPY . .
 
 
 #RUN echo "[mongodb-org-6.0]" >> /etc/yum.repos.d/mongodb-org-6.0.repo
