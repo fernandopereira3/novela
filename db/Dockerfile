@@ -15,7 +15,8 @@ COPY . .
 
 #RUN dnf update -y
 #RUN dnf install mongodb-org -y
-#RUN mongoimport --db=cpppac --collection=sentenciados --type=csv --file=db.csv --headerline
+RUN cd /db
+CMD [ "mongoimport", "--db=cpppac", "--collection=sentenciados", "--type=csv", "--file=db.csv", "--headerline"]
 #CMD ["systemctl", "start", "mongod"]
 #RUN cd /db
 EXPOSE 27017
