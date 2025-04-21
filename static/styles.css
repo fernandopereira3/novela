@@ -15,9 +15,9 @@ body {
                                                       /* Header styles */
 .header {
    display: inline-flex;
-   height: 40px;
+   height: 50px;
    display: flex;
-   background-color: #004a8d;
+   background-color: #1c5890;
    color: white;
    padding: 15px 0;
 }
@@ -25,13 +25,13 @@ body {
 .header img{
    position: relative;
    left: 10px;
-   transform: translateY(-40%);
-   width: 35px;
-   height: 35px;
+   transform: translateY(-29%);
+   width: 55px;
+   height: 55px;
 }
 
 .header h1 {
-   font-size: 1.5rem;
+   font-size: 2rem;
    font-weight: 100;
    position: absolute;
    left: 30%;
@@ -84,87 +84,14 @@ body {
 .nav-tabs {
    background-color: #333;
    border-bottom: 1px solid #dee2e6;
-   height: 30px;
-}
-
-.nav-tabs li{
-   display: inline-block;
-   height: 30px;
-}
-
-.nav-tabs li a{
-   display: inline-block;
-   color: white;
-   text-decoration: none;
-   padding: 10px 10px;
-   transform: translateY(-10%);
-}
-
-.nav-tabs li a:hover{
-  background-color: #004a8d;
-  color: white;
-  height: 29px;
-  text-decoration: none;
-  padding: 10px 10px;
+   height: 50px;
+   padding: 5px;
 }
                                                          /* NAV BTN */
 
 .nav-btn {
-   height: 30px;
+   height: 20px;
 }
-
-.nav-btn li{
-   display: inline-block;
-   height: 30px;
-}
-
-.nav-btn li a{
-   background-color: #004a8d;
-   border-radius: 15px;
-   display: inline-block;
-   color: white;
-   text-decoration: none;
-   padding: 10px 10px;
-   transform: translateY(-10%);
-   transform: translateX(10%);
-}
-
-.nav-btn li a:hover{
-   background-color: rgb(183, 42, 42);
-   border-radius: 15px;
-   display: inline-block;
-   color: white;
-   text-decoration: none;
-   padding: 10px 10px;
-   transform: translateY(-10%);
-   transform: translateX(10%);
- }
-
- .nav-conta{
-   position: relative;
-   left: 10px;
-   transform: translateY(-10%);
- }
-
- .nav-conta li{
-   display: inline-block;
-   height: 30px;
-}
-
-.nav-conta li a{
-   background-color: #004a8d;
-   border-radius: 15px;
-   display: inline-block;
-   color: white;
-   text-decoration: none;
-   padding: 10px 10px;
-   transform: translateY(-10%);
-}
-
-.nav-conta label{
-   font-weight: bolder;
-}
-
 
                                                          /* BTNs */
 .btn-adicionar {
@@ -232,6 +159,28 @@ body {
    border: #004a8d;
 }
 
+.btn-salvar-db {
+   background-color: #004a8d;
+   border-radius: 15px;
+   display: inline-block;
+   color: white;
+   text-decoration: none;
+   padding: 10px 10px;
+   transform: translateY(-10%);
+   transform: translateX(10%);
+}
+
+.btn-salvar-db:hover{
+   background-color: rgb(183, 42, 42);
+   border-radius: 15px;
+   display: inline-block;
+   color: white;
+   text-decoration: none;
+   padding: 10px 10px;
+   transform: translateY(-10%);
+   transform: translateX(10%);
+ }
+
                                                             /* Footer */
 .footer {
    background-color: #004a8d;
@@ -259,45 +208,22 @@ fieldset>legend{
 
                                                             /* forms */
 
-.Resultados {
-   text-align: center;
-   padding: 40px;
-   width: 70%; 
-   margin-top: 20px;
-   line-height: 2.5;
-   transform: translateX(25%);
-}
-
-.Resultados td{
-   font-size: 20px;
-}
-
-.Resultados td{
-   text-align: left;
-   padding: 10px;
-}
-
-#pesquisa-form{
+.table-striped-columns {
    display: block;
-   position: relative;
-   width: 20%;
-   height: 20%;
-   font-weight: bold;
-   border-radius: 10px;
-   border: 1px solid black;
-   line-height: 1.5;
-   margin: 10px auto;
-   padding: 20px;
+   margin: 20px auto;
+   border-radius: 3% ;
+   padding: 5px;
 }
 
-                                                   /* btns*/
-.btn-pequisa{
-   margin: 10px auto;
+.pesquisa-form{
+   display: block;
+   margin: 20px auto;
+   background-color: #f2f2f2;
+   border: 1px solid black;
+   border-radius: 3% ;
+   padding: 10px;
+   transform: translateX(1%);
 }
-.btn-limpa{
-   margin: 10px auto;
-}
-.btn-limpa:hover{
-   background-color: #8d0000;
-   color: white;
-}
+
+                                                   /* btns*
+

@@ -1,6 +1,16 @@
-from flask import render_template, jsonify
+from flask import render_template, jsonify, request, flash, redirect, url_for
 import pandas as pd
-from main import app
+import datetime
+import io
+from main import app, db  # Make sure to import db from main
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from flask import send_file
+
+# Create a global DataFrame to store the data
+df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
 
 def get_total_counts(df):
     try:
@@ -21,7 +31,31 @@ def get_total_counts(df):
 
 @app.route('/saida', methods=['GET'])
 def lista_saida():
-    df_lista_saida = 0
-    res_saida = get_total_counts(df_lista_saida)
-    tabela_saida = df_lista_saida.to_html(index=False)
-    return render_template('saida.html', tabela_saida=tabela_saida, res_saida=res_saida)
+    global df_lista_saida
+    
+    # Load data from MongoDB collection
+    try:
+        # Check if collection exists
+        if 'lista_sentenciados' in db.list_collection_names():
+            # Create DataFrame from the lista_sentenciados collection
+            df_lista_saida = pd.DataFrame(list(db.lista_sentenciados.find({}, {'_id': 0})))
+            
+            # If DataFrame is empty, initialize with proper columns
+            if df_lista_saida.empty:
+                df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+        else:
+            # If collection doesn't exist, create empty DataFrame
+            df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+            flash('A coleção lista_sentenciados não existe no banco de dados.', 'warning')
+    except Exception as e:
+        print(f"Error loading data from MongoDB: {str(e)}")
+        df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+        flash(f'Erro ao carregar dados: {str(e)}', 'danger')
+    
+    # Calculate totals
+    totals = get_total_counts(df_lista_saida)
+    
+    # Convert DataFrame to HTML table
+    tabela_html = df_lista_saida.to_html(index=False, classes='table table-striped table-bordered')
+    
+    return render_template('saida.html', tabela_saida=tabela_html, totals=totals)

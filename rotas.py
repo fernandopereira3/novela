@@ -150,8 +150,10 @@ def adicionar_lista(matricula):
 @app.route('/lista-selecionados', methods=['GET'])
 def visualizar_lista():
     global df_lista_sentenciados
+    
     try:
         totals = {
+            'matriculas': df_lista_sentenciados['matricula'].count(),
             'garrafas': df_lista_sentenciados['garrafas'].replace('', pd.NA).fillna(0).astype(int).sum(),
             'homens': df_lista_sentenciados['homens'].replace('', pd.NA).fillna(0).astype(int).sum(),
             'mulheres': df_lista_sentenciados['mulheres'].replace('', pd.NA).fillna(0).astype(int).sum(),
@@ -166,10 +168,10 @@ def visualizar_lista():
             'criancas': 0
         }
 
-    tabela_html = df_lista_sentenciados.to_html(index=False)
+    # Convert DataFrame to HTML table with Bootstrap classes
+    tabela_html = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered table-hover')
 
-    return render_template('lista.html', tabela=tabela_html, totals=totals)
-
+    return render_template('lista.html', tabela_saida=tabela_html, totals=totals)
 
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
@@ -219,6 +221,38 @@ def iniciar_saida():
     current_hour = datetime.datetime.now().hour
     if current_hour < 14:
         return jsonify({'message': 'Este recurso so pode ser usado apos as 14:00 horas'})
+
+
+@app.route('/salvar-no-banco', methods=['POST'])
+def salvar_lista_no_banco():
+    global df_lista_sentenciados
+    
+    if df_lista_sentenciados.empty:
+        return jsonify({'status': 'error', 'message': 'Não há dados para salvar no banco!'})
+    
+    try:
+        # Criar nome da coleção com timestamp para evitar conflitos
+        collection_name = f"lista_sentenciados"
+        collection = db[collection_name]
+        
+        # Limpar dados existentes na coleção
+        collection.delete_many({})
+        
+        # Converter DataFrame para lista de dicionários e salvar no MongoDB
+        registros = df_lista_sentenciados.to_dict('records')
+          
+        # Inserir registros na coleção
+        result = collection.insert_many(registros)
+        
+        # Verificar se inserção foi bem-sucedida
+        if len(result.inserted_ids) == len(registros):
+            return jsonify({'status': 'success', 'message': f'Lista salva com sucesso na coleção "{collection_name}"!'})
+        else:
+            return jsonify({'status': 'warning', 'message': f'Alguns registros não foram salvos. {len(result.inserted_ids)} de {len(registros)} registros salvos.'})
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Erro ao salvar no banco de dados: {str(e)}'})
+    
 
 
 @app.route('/')

@@ -3,92 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONTROLE DE SAIDA</title>
+    <title>Lista de Selecionados</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    .totals-card {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .action-buttons {
+        margin-bottom: 20px;
+    }
+</style>
 <body>
     <div class="header">
         <img src="../static/img/penla.png" alt="Logo">
         <h1><a href="/">Sistema</a></h1>
     </div>
     <nav class="nav-tabs">
-        <ul>
-            <li>
-                <a href="/lista" class="link">VOLTAR</a>  
-            </li>
-        </ul>
+        <div class="action-buttons">
+            <a href="/lista" class="btn btn-primary">
+                <i></i> PESQUISA
+            </a>
+            <a href="/download" class="btn btn-primary">
+                <i></i> BAIXAR LISTA
+            </a>
+            <form action="/salvar-no-banco" method="post" class="d-inline">
+                <button type="submit" class="btn btn-primary" onsubmit="return confirm('Deseja Salvar a Lista?')>
+                    <i class="bi bi-database"></i>SALVAR LISTA
+                </button>
+            </form>
+        </div>
     </nav>
-    <br>
-    </br>
     <div class="container">
-        <nav class="nav-btn">
-            <ul>
-                <li>
-                    <a href="/download">Baixar Lista</a>
-                </li>
-                <li>
-                    <a href="/btn-saida" id="btn-ini-saida">INICIAR SAIDA</a>
-                </li>
-            </ul>
-        </nav>
+        <h1 class="mt-4 mb-4">Lista de Selecionados</h1>
         
-        <!-- Existing table -->
-        <div class="table-responsive">
-            <style>
-                table {
-                    width: 90%;
-                    border-collapse: collapse;
-                    margin: 20px 0;
-                    transform: translateX(5%);
-                }
-                th, td {
-                    font: 1em arial;
-                    font-weight: bold;
-                    border: 1px solid #000000;
-                    padding: 8px;
-                    text-align: center;
-                }
-                th {
-                    font-size: 1.2em;
-                    background-color: #f2f2f2;
-                    color: #333;
-                }
-                tr:nth-child(even) {
-                    background-color: #f9f9f9;
-                }
-                tr:hover {
-                    background-color: #f5f5f5;
-                }
-            </style>
-            {{ tabela|safe }}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Totals Card -->
+        <div class="card totals-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Resumo</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header">Matriculas</div>
+                            <div class="card-body">
+                                <h3>{{ totals.matriculas }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header">Garrafas</div>
+                            <div class="card-body">
+                                <h3>{{ totals.garrafas }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header">Homens</div>
+                            <div class="card-body">
+                                <h3>{{ totals.homens }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header">Mulheres</div>
+                            <div class="card-body">
+                                <h3>{{ totals.mulheres }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-header">Crianças</div>
+                            <div class="card-body">
+                                <h3>{{ totals.criancas }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
+        <!-- Table Container -->
+        <div class="table-container">
+            {% if tabela_saida %}
+                {{ tabela_saida|safe }}
+            {% else %}
+                <div class="alert alert-info">Nenhum registro encontrado.</div>
+            {% endif %}
+        </div>
     </div>
-    <nav class="nav-conta">
-        <ul>
-            <li>
-                <label for="PETs">PETs:</label>{{ totals.garrafas }}
-            </li>
-            <li>
-  
-            </li>
-            <li>
-                <label for="Homens">Homens:</label>{{ totals.homens }}
-            </li>
-            <li>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add any JavaScript functionality here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add delete functionality to each row
+            const table = document.querySelector('table');
+            if (table) {
+                // Add a new header column for actions
+                const headerRow = table.querySelector('thead tr');
+                if (headerRow) {
+                    const actionHeader = document.createElement('th');
+                    actionHeader.textContent = 'Ações';
+                    headerRow.appendChild(actionHeader);
+                }
                 
-            </li>
-            <li>
-                <label for="Mulheres">Mulheres:</label>{{ totals.mulheres }}
-            </li>
-            <li>
-  
-            </li>
-            <li>
-                <label for="Criancas">Crianças:</label>{{ totals.criancas }}
-            </li>
-        </ul>
-    </nav>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+                // Add delete button to each row
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > 0) {
+                        const matricula = cells[0].textContent.trim();
+                        
+                        // Create action cell
+                        const actionCell = document.createElement('td');
+                        
+                        // Create delete button
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn btn-sm btn-danger';
+                        deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                        deleteBtn.onclick = function() {
+                            if (confirm('Tem certeza que deseja remover este item?')) {
+                                fetch(`/remover/${matricula}`, {
+                                    method: 'DELETE'
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success') {
+                                        row.remove();
+                                        alert('Item removido com sucesso!');
+                                        // Refresh the page to update totals
+                                        location.reload();
+                                    } else {
+                                        alert('Erro ao remover item: ' + data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Erro ao remover item.');
+                                });
+                            }
+                        };
+                        
+                        actionCell.appendChild(deleteBtn);
+                        row.appendChild(actionCell);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

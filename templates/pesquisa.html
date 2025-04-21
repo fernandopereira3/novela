@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CONTROLE DE SAIDA</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="header">
@@ -12,56 +13,72 @@
         <h1><a href="/">Sistema</a></h1>
     </div>
     <nav class="nav-tabs">
-        <ul>
-            <li class="">
-                <a href="/" >INICIO</a> 
-            </li>
-            <li>
-                <a href="/lista-selecionados" >VER LISTA</a>
-            </li>
-        </ul>
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">
+                <i></i> INICIO
+            </a>
+            <a href="/lista-selecionados" class="btn btn-primary">
+                <i></i> VER LISTA
+            </a>
+        </div>
     </nav>
     <p>
 
     
     </p>
-    <form method="POST" id="pesquisa-form">
+    <div class="row">
+    <div class="col">
+    <form method="POST" class="pesquisa-form">
         {{ form.csrf_token }}
-        <div class="grid-container">
-            <div class="grid-item">
-                <fieldset id="fieldset-pesquisa">
-                    <legend>Pesquisa Nome ou Matricula</legend>
-                    <div class="form-row">
-                        <p><label for="matricula">Matrícula:</label> {{ form.matricula }}</p>
-                        <p><label for="nome">Nome:</label> {{ form.nome }}</p>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="grid-item">
-                <fieldset id="fieldset-volumes">
-                    <legend>Volumes</legend>
-                    <div class="form-row">
-                        <p><label for="garrafas">Garrafas:</label> {{ form.garrafas(size=10) }}</p>
-                        <p><label for="homens">Homens:</label> {{ form.homens(size=10) }}</p>
-                        <p><label for="mulheres">Mulheres:</label> {{ form.mulheres(size=10) }}</p>
-                        <p><label for="criancas">Crianças:</label> {{ form.criancas(size=10) }}</p>                    
-                    </div>
-                </fieldset>
-            </div>
-            <div class="grid-item buttons">
-                <p>
-                    <button type="submit" class="btn-pequisa">Pesquisar</button>
-                    <button type="submit" class="btn-limpa" formaction="{{ url_for('limpar_lista') }}" formmethod="post" onclick="return confirm('Tem certeza que deseja apagar toda a lista?');">
-                        <i class="fas fa-trash"></i> Limpar Lista
-                    </button>
-                </p>
-            </div>
+        <div class="form-floating mb-3 mt-3">
+            <input type="text" class="form-control" id="matricula" placeholder="Matricula" name="matricula">
+            <label for="matricula">{{ form.matricula.label }}</label>
         </div>
-    </form>    <br>
+      
+        <div class="form-floating mt-3 mb-3">
+            <input type="text" class="form-control" id="nome" placeholder="Nome" name="nome">
+            <label for="nome">{{ form.nome.label }}</label>   
+        </div>  
 
-    </br>
-    {% if sentenciados %}
-        <table class="Resultados">
+        <div class="form-floating mt-3 mb-3">
+            <input type="text" class="form-control" id="garrafas" placeholder="PETs" name="garrafas">
+            <label for="garrafas">{{ form.garrafas.label }}</label>   
+        </div> 
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="text" class="form-control" id="homens" placeholder="Homens" name="homens">
+            <label for="homens">{{ form.homens.label }}</label>   
+        </div>  
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="text" class="form-control" id="mulheres" placeholder="Mulheres" name="mulheres">
+            <label for="mulheres">{{ form.mulheres.label }}</label>   
+        </div>  
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="text" class="form-control" id="criancas" placeholder="Crianças" name="criancas">
+            <label for="criancas">{{ form.criancas.label }}</label>   
+        </div>  
+       
+        <p>
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+            <button type="submit" class="btn btn-danger" formaction="{{ url_for('limpar_lista') }}" formmethod="post" onclick="return confirm('Tem certeza que deseja apagar toda a lista?');">
+                <i class="fas fa-trash"></i> Limpar Lista
+            </button>
+        </p>
+        </form>
+        </div>
+        <div class="col">
+        {% if sentenciados %}
+        <table class="table table-striped-columns">
+            <thead>
+                <tr>
+                  <th scope="col">Matricula</th>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Alojamento</th>
+                  <th scope="col">Acao</th>
+                </tr>
+              </thead>
             <tbody>
                 {% for sentenciado in sentenciados %}
                     <tr>
@@ -69,15 +86,18 @@
                         <td>{{ sentenciado['nome'] }}</td>
                         <td>{{ sentenciado['pavilhao'] }}</td>
                         <td>
-                            <button class="btn-adicionar" onclick="adicionar('{{ sentenciado['matricula'] }}')">Adicionar</button>
-                            <button class="btn-apagar" onclick="apagar('{{ sentenciado['matricula'] }}')">Remover</button>
+                            <button class="btn btn-primary" onclick="adicionar('{{ sentenciado['matricula'] }}')">Adicionar</button>
+                            <button class="btn btn-danger" onclick="apagar('{{ sentenciado['matricula'] }}')">Remover</button>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% else %}
-    {% endif %}
+        {% else %}
+        {% endif %}
+        </div>
+    </div>
+
     <script>
         function adicionar(matricula) {
             const garrafas = document.getElementById('garrafas').value;
