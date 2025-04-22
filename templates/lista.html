@@ -7,23 +7,6 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
 </head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    .table-container {
-        margin-top: 20px;
-        overflow-x: auto;
-        text-align: center;
-    }
-    .table-container th{
-        text-align: center;
-    }
-    .totals-card {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    .action-buttons {
-        margin-bottom: 20px;
-    }
-</style>
 <body>
     <div class="header">
         <img src="../static/img/penla.png" alt="Logo">
@@ -37,12 +20,25 @@
             <a href="/download" class="btn btn-primary">
                 <i></i> BAIXAR LISTA
             </a>
-            <form action="/salvar-no-banco" method="post" class="d-inline">
-                <button type="submit" class="btn btn-primary" onsubmit="return confirm('Deseja Salvar a Lista?')>
+            <form action="/salvar-lista" method="post" class="d-inline" onsubmit="return handleSubmit(event)">
+                <button type="submit" class="btn btn-primary">
                     <i class="bi bi-database"></i>SALVAR LISTA
                 </button>
             </form>
-        </div>
+            <script>
+                async function handleSubmit(event) {
+                    event.preventDefault();
+                    const form = event.target;
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form)
+                    });
+                    const message = await response.text();
+                    alert(message);
+                    return false;
+                }
+            </script>        
+            </div>
     </nav>
     <div class="container">
         <h1 class="mt-4 mb-4">Lista de Selecionados</h1>
@@ -64,7 +60,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-header">Matriculas</div>
+                            <div class="card-header">Preso com Visita</div>
                             <div class="card-body">
                                 <h3>{{ totals.matriculas }}</h3>
                             </div>
@@ -72,7 +68,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="card text-center">
-                            <div class="card-header">Garrafas</div>
+                            <div class="card-header">PET</div>
                             <div class="card-body">
                                 <h3>{{ totals.garrafas }}</h3>
                             </div>
@@ -144,7 +140,7 @@
                         // Create delete button
                         const deleteBtn = document.createElement('button');
                         deleteBtn.className = 'btn btn-sm btn-danger';
-                        deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                        deleteBtn.innerHTML = '<i class="bi bi-trash">remover</i>';
                         deleteBtn.onclick = function() {
                             if (confirm('Tem certeza que deseja remover este item?')) {
                                 fetch(`/remover/${matricula}`, {

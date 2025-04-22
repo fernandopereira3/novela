@@ -3,6 +3,7 @@ import pandas as pd
 import re
 import datetime
 import io
+import requests
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -193,6 +194,8 @@ def limpar_lista():
     flash('Lista limpa com sucesso!', 'success')
     return redirect(url_for('pesquisa_matricula'))
 
+
+
 @app.route('/clear', methods=['GET'])
 def clean_matricula_complete():
     count = 0
@@ -215,20 +218,13 @@ def clean_matricula_complete():
     return f"LIMPO ! FORAM REMOVIDOS ESPACOS, PONTOS E O DIGITO DE {count} MATRICULAS"
 
 
-@app.route('/btn-saida', methods=['GET'])
-def iniciar_saida():
-    global df_lista_sentenciados
-    current_hour = datetime.datetime.now().hour
-    if current_hour < 14:
-        return jsonify({'message': 'Este recurso so pode ser usado apos as 14:00 horas'})
 
-
-@app.route('/salvar-no-banco', methods=['POST'])
+@app.route('/salvar-lista', methods=['POST'])
 def salvar_lista_no_banco():
     global df_lista_sentenciados
     
     if df_lista_sentenciados.empty:
-        return jsonify({'status': 'error', 'message': 'Não há dados para salvar no banco!'})
+        return jsonify({'Nao ha dados para salvar'})
     
     try:
         # Criar nome da coleção com timestamp para evitar conflitos
@@ -246,13 +242,12 @@ def salvar_lista_no_banco():
         
         # Verificar se inserção foi bem-sucedida
         if len(result.inserted_ids) == len(registros):
-            return jsonify({'status': 'success', 'message': f'Lista salva com sucesso na coleção "{collection_name}"!'})
+            return jsonify({f"Lista salva com sucesso"})
         else:
-            return jsonify({'status': 'warning', 'message': f'Alguns registros não foram salvos. {len(result.inserted_ids)} de {len(registros)} registros salvos.'})
+            return jsonify({f'Alguns registros nao foram salvos. {len(result.inserted_ids)} de {len(registros)} registros salvos.'})
     
     except Exception as e:
-        return jsonify({'status': 'error', 'message': f'Erro ao salvar no banco de dados: {str(e)}'})
-    
+        return jsonify({f'Erro ao salvar no banco de dados: {str(e)}'})    
 
 
 @app.route('/')
