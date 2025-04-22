@@ -11,6 +11,10 @@
     .table-container {
         margin-top: 20px;
         overflow-x: auto;
+        text-align: center;
+    }
+    .table-container th{
+        text-align: center;
     }
     .totals-card {
         margin-top: 20px;
@@ -51,7 +55,7 @@
             {% endif %}
         {% endwith %}
         
-        <!-- Totals Card -->
+        <!-- RESUMO -->
         <div class="card totals-card">
             <div class="card-header bg-primary text-white">
                 <h5 class="card-title mb-0">Resumo</h5>
@@ -102,7 +106,7 @@
             </div>
         </div>
         
-        <!-- Table Container -->
+        <!-- LISTA -->
         <div class="table-container">
             {% if tabela_saida %}
                 {{ tabela_saida|safe }}

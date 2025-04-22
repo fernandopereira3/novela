@@ -29,6 +29,7 @@ etc/
 share/
 bin/
 *.cfg
+*.csv
 MANIFEST
 
 # PyInstaller

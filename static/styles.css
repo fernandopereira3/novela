@@ -17,7 +17,7 @@ body {
    display: inline-flex;
    height: 50px;
    display: flex;
-   background-color: #1c5890;
+   background-color: #0d6efd;
    color: white;
    padding: 15px 0;
 }
@@ -26,8 +26,8 @@ body {
    position: relative;
    left: 10px;
    transform: translateY(-29%);
-   width: 55px;
-   height: 55px;
+   width: 50px;
+   height: 50px;
 }
 
 .header h1 {
@@ -181,30 +181,7 @@ body {
    transform: translateX(10%);
  }
 
-                                                            /* Footer */
-.footer {
-   background-color: #004a8d;
-   color: white;
-   padding: 20px;
-   margin-top: 30px;
-   border-top: 2px solid #ffcc29;
-   bottom: 0;
-   position: fixed;
-   width: 100%;
-   text-align: center;
-   height: 10px;
-}
-
-.footer p {
-   text-align: center;
-   font-size: 0.9rem;
-}
-
-fieldset>legend{
-   text-align: right;
-   font-size: 16px;
-   font-weight: initial;
-}
+ 
 
                                                             /* forms */
 
@@ -213,6 +190,7 @@ fieldset>legend{
    margin: 20px auto;
    border-radius: 3% ;
    padding: 5px;
+   text-align: center;
 }
 
 .pesquisa-form{
