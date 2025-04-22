@@ -68,12 +68,12 @@ Before installation, ensure you have:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/fernandopereira3/lista.git
+   git clone https://github.com/fernandopereira3/novela.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd lista
+   cd novela
    ```
 
 3. Install required dependencies:
@@ -88,10 +88,10 @@ Before installation, ensure you have:
 
 5. Start the application:
    ```bash
-   python app.py
+   python main.py
    ```
 
-6. Access the application at `http://localhost:80` in your web browser
+6. Access the application at `http://localhost:5000` in your web browser
 
 ## 🚀 Usage
 
@@ -204,12 +204,12 @@ Antes da instalação, certifique-se de ter:
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/fernandopereira3/lista.git
+   git clone https://github.com/fernandopereira3/novela.git
    ```
 
 2. Navegue até o diretório do projeto:
    ```bash
-   cd lista
+   cd novela
    ```
 
 3. Instale as dependências necessárias:
@@ -224,10 +224,10 @@ Antes da instalação, certifique-se de ter:
 
 5. Inicie a aplicação:
    ```bash
-   python app.py
+   python main.py
    ```
 
-6. Acesse a aplicação em `http://localhost:80` no seu navegador
+6. Acesse a aplicação em `http://localhost:5000` no seu navegador
 
 ## Uso
 
