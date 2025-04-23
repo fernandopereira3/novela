@@ -3,7 +3,6 @@ import pandas as pd
 import re
 import datetime
 import io
-import requests
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -170,7 +169,7 @@ def visualizar_lista():
         }
 
     # Convert DataFrame to HTML table with Bootstrap classes
-    tabela_html = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered table-hover')
+    tabela_html = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered')
 
     return render_template('lista.html', tabela_saida=tabela_html, totals=totals)
 

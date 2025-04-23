@@ -10,7 +10,7 @@ from reportlab.lib.pagesizes import letter
 from flask import send_file
 
 # Create a global DataFrame to store the data
-df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas'])
 
 def get_total_counts(df):
     try:
@@ -42,14 +42,14 @@ def lista_saida():
             
             # If DataFrame is empty, initialize with proper columns
             if df_lista_saida.empty:
-                df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+                df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas'])
         else:
             # If collection doesn't exist, create empty DataFrame
-            df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+            df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas'])
             flash('A coleção lista_sentenciados não existe no banco de dados.', 'warning')
     except Exception as e:
         print(f"Error loading data from MongoDB: {str(e)}")
-        df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+        df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas'])
         flash(f'Erro ao carregar dados: {str(e)}', 'danger')
     
     # Calculate totals
@@ -59,3 +59,12 @@ def lista_saida():
     tabela_html = df_lista_saida.to_html(index=False, classes='table table-striped table-bordered')
     
     return render_template('saida.html', tabela_saida=tabela_html, totals=totals)
+
+@app.route('/limpar_saida', methods=['POST'])
+def limpar_saida():
+    global df_lista_saida
+
+    
+    df_lista_saida = pd.DataFrame(columns=df_lista_saida.columns)
+    flash('Lista limpa com sucesso!', 'success')
+    return redirect(url_for('lista_saida'))

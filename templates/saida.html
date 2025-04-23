@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CONTROLE DE SAIDA</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="header">
@@ -15,7 +16,7 @@
         <div class="action-buttons">
             <form action="" method="post" class="d-inline" 
                   onsubmit="return confirm('Tem certeza que deseja limpar toda a lista?');">
-                <button formaction="{{ url_for('limpar_lista') }}" formmethod="post" type="submit" class="btn btn-danger">
+                <button formaction="{{ url_for('limpar_saida') }}" formmethod="post" type="submit" class="btn btn-danger">
                     <i class="bi bi-trash">APAGAR LISTA</i> 
                 </button>
             </form>
@@ -24,8 +25,6 @@
             </a>
         </div>
     </nav>
-            <title>Lista de Saída</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <div class="container">
                 <h1 class="mt-4 mb-4">Lista de Saída</h1>
                 
