@@ -65,6 +65,10 @@ def limpar_saida():
     global df_lista_saida
 
     
-    df_lista_saida = pd.DataFrame(columns=df_lista_saida.columns)
+    # Delete all documents from the collection
+    db.lista_sentenciados.delete_many({})
+    
+    # Reset the DataFrame to empty with proper columns
+    df_lista_saida = pd.DataFrame(columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas'])
     flash('Lista limpa com sucesso!', 'success')
     return redirect(url_for('lista_saida'))
