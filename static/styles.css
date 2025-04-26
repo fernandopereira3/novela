@@ -221,3 +221,15 @@ body {
     margin-bottom: 20px;
 }
 
+.sort-btn {
+   background: none;
+   border: none;
+   color: #007bff;
+   padding: 0 5px;
+}
+.sort-btn:hover {
+   color: #0056b3;
+}
+th {
+   white-space: nowrap;
+}

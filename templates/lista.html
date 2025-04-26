@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Selecionados</title>
+    <title>SAIDA DE VISITANTES</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
+    <!-- Add Font Awesome for sort icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <body>
     <div class="header">
         <img src="../static/img/penla.png" alt="Logo">
-        <h1><a href="/">Sistema</a></h1>
+        <h1><a href="/"></a></h1>
     </div>
     <nav class="nav-tabs">
         <div class="action-buttons">
@@ -41,7 +43,7 @@
             </div>
     </nav>
     <div class="container">
-        <h1 class="mt-4 mb-4">Lista de Selecionados</h1>
+        <h1 class="mt-4 mb-4">LISTA DE VISITANTES</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -114,7 +116,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Add any JavaScript functionality here
+        // Add JavaScript functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Add delete functionality to each row
             const table = document.querySelector('table');
@@ -122,6 +124,22 @@
                 // Add a new header column for actions
                 const headerRow = table.querySelector('thead tr');
                 if (headerRow) {
+                    // Add sort buttons to each header
+                    const headers = headerRow.querySelectorAll('th');
+                    headers.forEach((header, index) => {
+                        if (index < headers.length - 1) { // Skip the last column (actions)
+                            const headerText = header.textContent;
+                            header.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-center">
+                                    ${headerText}
+                                    <button class="btn btn-sm sort-btn" data-index="${index}">
+                                        <i class="fas fa-sort"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    });
+                    
                     const actionHeader = document.createElement('th');
                     actionHeader.textContent = 'Ações';
                     headerRow.appendChild(actionHeader);
@@ -168,8 +186,70 @@
                         row.appendChild(actionCell);
                     }
                 });
+                
+                // Add sorting functionality
+                const sortButtons = document.querySelectorAll('.sort-btn');
+                sortButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const columnIndex = parseInt(this.getAttribute('data-index'));
+                        sortTable(columnIndex);
+                    });
+                });
+                
+                // Table sorting function
+                function sortTable(columnIndex) {
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    
+                    // Determine current sort direction
+                    const currentIcon = sortButtons[columnIndex].querySelector('i');
+                    const isAscending = currentIcon.classList.contains('fa-sort') || 
+                                       currentIcon.classList.contains('fa-sort-down');
+                    
+                    // Update sort icons
+                    sortButtons.forEach(btn => {
+                        btn.querySelector('i').className = 'fas fa-sort';
+                    });
+                    
+                    currentIcon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                    
+                    // Sort the rows
+                    rows.sort((a, b) => {
+                        const aValue = a.querySelectorAll('td')[columnIndex].textContent.trim();
+                        const bValue = b.querySelectorAll('td')[columnIndex].textContent.trim();
+                        
+                        // Check if values are numbers
+                        const aNum = parseFloat(aValue);
+                        const bNum = parseFloat(bValue);
+                        
+                        if (!isNaN(aNum) && !isNaN(bNum)) {
+                            return isAscending ? aNum - bNum : bNum - aNum;
+                        } else {
+                            return isAscending 
+                                ? aValue.localeCompare(bValue, 'pt-BR') 
+                                : bValue.localeCompare(aValue, 'pt-BR');
+                        }
+                    });
+                    
+                    // Reappend sorted rows
+                    rows.forEach(row => tbody.appendChild(row));
+                }
             }
         });
     </script>
+    <style>
+        .sort-btn {
+            background: none;
+            border: none;
+            color: #007bff;
+            padding: 0 5px;
+        }
+        .sort-btn:hover {
+            color: #0056b3;
+        }
+        th {
+            white-space: nowrap;
+        }
+    </style>
 </body>
 </html>

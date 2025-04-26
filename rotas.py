@@ -173,6 +173,8 @@ def visualizar_lista():
 
     return render_template('lista.html', tabela_saida=tabela_html, totals=totals)
 
+
+
 @app.route('/remover/<matricula>', methods=['DELETE'])
 def remover_lista(matricula):
     global df_lista_sentenciados
