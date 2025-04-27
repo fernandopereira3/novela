@@ -23,11 +23,105 @@
             </a>
         </div>
     </nav>
-    <br>
-    
-    </br>
+
+   <div class="card totals-card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="card-title mb-0">Contagem dos Alojamentos</h5>
+        </div>
+        <div class="card-body">
+            <!-- Alojamento 1 -->
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">1A</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_1a|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">1B</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_1b|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alojamento 2 -->
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">2A</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_2a|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">2B</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_2b|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alojamento 3 -->
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">3A</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_3a|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">3B</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_3b|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alojamento 4 -->
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">4A</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_4a|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">4B</div>
+                        <div class="card-body">
+                            <h3>{{ totals.aloj_4b|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOTAL -->
+            <div class="row">
+                <div class="col">
+                    <div class="card text-center">
+                        <div class="card-header">TOTAL NA CASA</div>
+                        <div class="card-body">
+                            <h3>{{ totals.total|default(0) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </body>
 </html>
-
-
-

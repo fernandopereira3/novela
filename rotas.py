@@ -190,7 +190,6 @@ def remover_lista(matricula):
 @app.route('/limpar_lista', methods=['POST'])
 def limpar_lista():
     global df_lista_sentenciados
-
     df_lista_sentenciados = pd.DataFrame(columns=df_lista_sentenciados.columns)
     flash('Lista limpa com sucesso!', 'success')
     return redirect(url_for('pesquisa_matricula'))
@@ -253,4 +252,20 @@ def salvar_lista_no_banco():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Calculate totals for each pavilion from your data
+    totals = {
+        'aloj_1a': db.sentenciados.count_documents({'pavilhao': '1A'}),
+        'aloj_1b': db.sentenciados.count_documents({'pavilhao': '1B'}),
+        'aloj_2a': db.sentenciados.count_documents({'pavilhao': '2A'}),
+        'aloj_2b': db.sentenciados.count_documents({'pavilhao': '2B'}),
+        'aloj_3a': db.sentenciados.count_documents({'pavilhao': '3A'}),
+        'aloj_3b': db.sentenciados.count_documents({'pavilhao': '3B'}),
+        'aloj_4a': db.sentenciados.count_documents({'pavilhao': '4A'}),
+        'aloj_4b': db.sentenciados.count_documents({'pavilhao': '4B'}),
+        'total': db.sentenciados.count_documents({})
+    }
+    
+    return render_template('index.html', totals=totals)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)

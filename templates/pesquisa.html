@@ -61,9 +61,6 @@
        
         <p>
             <button type="submit" class="btn btn-primary">Pesquisar</button>
-            <button type="submit" class="btn btn-danger" formaction="{{ url_for('limpar_lista') }}" formmethod="post" onclick="return confirm('Tem certeza que deseja apagar toda a lista?');">
-                <i class="fas fa-trash"></i> Limpar Lista
-            </button>
         </p>
         </form>
         </div>
@@ -85,8 +82,7 @@
                         <td>{{ sentenciado['nome'] }}</td>
                         <td>{{ sentenciado['pavilhao'] }}</td>
                         <td>
-                            <button class="btn btn-primary" onclick="adicionar('{{ sentenciado['matricula'] }}')">Adicionar</button>
-                            <button class="btn btn-danger" onclick="apagar('{{ sentenciado['matricula'] }}')">Remover</button>
+                            <button class="btn btn-success" onclick="adicionar('{{ sentenciado['matricula'] }}')">Adicionar</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -128,47 +124,6 @@
             });
         }
     </script>
-    <script>
-        function apagar(matricula) {
-            if (confirm('Voce está certo disso?')) {
-                fetch(`/remover/${matricula}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Erro ao apagar a matricula' + matricula);
-                });
-            } else {
-                alert('Operação cancelada');
-            }
-        }
-    </script>
-    <script>
-        function apagar_nome_lista(nome) {
-            if (confirm('ESTA AÇÃO É IRREVERSÍVEL, E APAGA O NOME DA LISTA. VOCE TEM CERTEZA?')) {
-                fetch(`/del-nome-lista/${nome}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Erro ao apagar o nome da lista: ' + nome);
-                });
-            } else {
-                alert('Operação cancelada');
-            }
-        }
-    </script>
-
 </div>
 </body>
 </html>

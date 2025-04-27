@@ -19,14 +19,29 @@
             <a href="/lista" class="btn btn-primary">
                 <i></i> PESQUISA
             </a>
-            <a href="/download" class="btn btn-primary">
+            <a href="/download" class="btn btn-warning">
                 <i></i> BAIXAR LISTA
             </a>
             <form action="/salvar-lista" method="post" class="d-inline" onsubmit="return handleSubmit(event)">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-database"></i>SALVAR LISTA
+                <button type="submit" class="btn btn-success">
+                    <i></i>SALVAR LISTA
                 </button>
             </form>
+            <form action="/limpar_lista" method="post" class="d-inline" onsubmit="return confirmClear(event)">
+                <button type="submit" class="btn btn-danger">
+                    <i></i> LIMPAR LISTA
+                </button>
+            </form>
+            <script>
+                function confirmClear(event) {
+                    if (confirm('ATENÇÃO: Esta ação irá remover todos os registros da lista. Deseja continuar?')) {
+                        return true;
+                    } else {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+            </script>           
             <script>
                 async function handleSubmit(event) {
                     event.preventDefault();
@@ -39,7 +54,8 @@
                     alert(message);
                     return false;
                 }
-            </script>        
+            </script>
+                   
             </div>
     </nav>
     <div class="container">
