@@ -10,19 +10,29 @@
 <body>
     <div class="header">
         <img src="../static/img/penla.png" alt="Logo">
-        <h1><a href="/">Sistema</a></h1>
+        <h1><a href="/"></a></h1>
     </div>
     <nav class="nav-tabs">
         <div class="action-buttons">
-            <form action="" method="post" class="d-inline" 
-                  onsubmit="return confirm('Tem certeza que deseja limpar toda a lista?');">
-                <button formaction="{{ url_for('limpar_saida') }}" formmethod="post" type="submit" class="btn btn-danger">
-                    <i class="bi bi-trash">APAGAR LISTA</i> 
-                </button>
-            </form>
             <a href="/lista" class="btn btn-primary">
                 <i>PESQUISA</i>
             </a>
+            <form action="" method="post" class="d-inline" 
+                onsubmit="return confirmClear(event);">
+                <button formaction="{{ url_for('limpar_saida') }}" formmethod="post" type="submit" class="btn btn-danger">
+                    <i>APAGAR LISTA</i> 
+                </button>
+            </form>
+            <script>
+                function confirmClear(event) {
+                    if (confirm('ATENÇÃO: Esta ação irá remover todos os registros da lista. Deseja continuar?')) {
+                        return true;
+                    } else {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+            </script> 
         </div>
     </nav>
             <div class="container">
@@ -42,15 +52,23 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card text-center">
-                                    <div class="card-header">Garrafas</div>
+                                    <div class="card-header">Preso com Visita</div>
+                                    <div class="card-body">
+                                        <h3>{{ total_matriculas }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-header">PET</div>
                                     <div class="card-body">
                                         <h3>{{ totals.garrafas }}</h3>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card text-center">
                                     <div class="card-header">Homens</div>
                                     <div class="card-body">
@@ -58,7 +76,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card text-center">
                                     <div class="card-header">Mulheres</div>
                                     <div class="card-body">
@@ -66,7 +84,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="card text-center">
                                     <div class="card-header">Crianças</div>
                                     <div class="card-body">
@@ -77,8 +95,9 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Table Container -->
-                <div class="table-container">
+                <div class="table table-bordered table-container">
                     {% if tabela_saida %}
                         {{ tabela_saida|safe }}
                     {% else %}

@@ -17,7 +17,7 @@
     <nav class="nav-tabs">
         <div class="action-buttons">
             <a href="/lista" class="btn btn-primary">
-                <i></i> PESQUISA
+                <i></i> VOLTAR PARA PESQUISA
             </a>
             <a href="/download" class="btn btn-warning">
                 <i></i> BAIXAR LISTA
@@ -121,7 +121,7 @@
         </div>
         
         <!-- LISTA -->
-        <div class="table-container">
+        <div class="table table-bordered table-container">
             {% if tabela_saida %}
                 {{ tabela_saida|safe }}
             {% else %}
