@@ -36,7 +36,7 @@
         </div>
     </nav>
             <div class="container">
-                <h1 class="mt-4 mb-4">Lista de Saída</h1>
+                <h1 class="mt-4 mb-4">SAIDA DE VISITANTES</h1>
                 
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -45,56 +45,64 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <!-- Totals Card -->
-                <div class="card totals-card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">Resumo</h5>
+
+                <!-- RESUMO -->
+        <div class="card totals-card justify-content-center">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Resumo</h5>
+            </div>
+            
+            <div class="card-body">
+                
+                <!-- PRESOS E PETS -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header"><i class="fas fa-users"></i> Preso com Visita</div>
+                            <div class="card-body">
+                                <h3>{{ total_matriculas }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-header">Preso com Visita</div>
-                                    <div class="card-body">
-                                        <h3>{{ total_matriculas }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-header">PET</div>
-                                    <div class="card-body">
-                                        <h3>{{ totals.garrafas }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-header">Homens</div>
-                                    <div class="card-body">
-                                        <h3>{{ totals.homens }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-header">Mulheres</div>
-                                    <div class="card-body">
-                                        <h3>{{ totals.mulheres }}</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card text-center">
-                                    <div class="card-header">Crianças</div>
-                                    <div class="card-body">
-                                        <h3>{{ totals.criancas }}</h3>
-                                    </div>
-                                </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header"><i class="fas fa-flask"></i> PET</div>
+                            <div class="card-body">
+                                <h3>{{ saida.garrafas }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                 <!--HOMENS, MULHERES E CRIANÇAS-->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header"><i class="fas fa-male"></i> Homens</div>
+                            <div class="card-body">
+                                <h3>{{ saida.homens }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header"><i class="fas fa-female"></i> Mulheres</div>
+                            <div class="card-body">
+                                <h3>{{ saida.mulheres }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header"><i class="fas fa-child"></i> Crianças</div>
+                            <div class="card-body">
+                                <h3>{{ saida.criancas }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
                 <!-- Table Container -->
                 <div class="table table-bordered table-container">

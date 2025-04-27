@@ -32,7 +32,6 @@ def get_total_counts(df):
 @app.route('/saida', methods=['GET'])
 def lista_saida():
     global df_lista_saida
-    
     # Load data from MongoDB collection
     try:
         # Check if collection exists
@@ -53,13 +52,13 @@ def lista_saida():
         flash(f'Erro ao carregar dados: {str(e)}', 'danger')
     
     # Calculate totals - returns dictionary with 'garrafas', 'homens', 'mulheres', 'criancas' sums
-    totals = get_total_counts(df_lista_saida)
+    saida = get_total_counts(df_lista_saida)
     # Count total number of matriculas
     total_matriculas = len(df_lista_saida['matricula'].unique())    
     # Convert DataFrame to HTML table
-    tabela_html = df_lista_saida.to_html(index=False, classes='table table-striped table-bordered')
+    tabela_saida = df_lista_saida.to_html(index=False, classes='table table-striped table-bordered')
     
-    return render_template('saida.html', tabela_saida=tabela_html, totals=totals, total_matriculas=total_matriculas)
+    return render_template('saida.html', tabela_saida=tabela_saida, saida=saida, total_matriculas=total_matriculas)
 
 
 @app.route('/limpar_saida', methods=['POST'])

@@ -59,7 +59,7 @@
             </div>
     </nav>
     <div class="container">
-        <h1 class="mt-4 mb-4">LISTA DE VISITANTES</h1>
+        <h1 class="mt-4 mb-4">ENTRADA DE VISITANTES</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -70,49 +70,57 @@
         {% endwith %}
         
         <!-- RESUMO -->
-        <div class="card totals-card">
+        <div class="card totals-card justify-content-center">
             <div class="card-header bg-primary text-white">
                 <h5 class="card-title mb-0">Resumo</h5>
             </div>
+            
             <div class="card-body">
+                
+                <!-- PRESOS E PETS -->
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col">
                         <div class="card text-center">
-                            <div class="card-header">Preso com Visita</div>
+                            <div class="card-header"><i class="fas fa-users"></i> Preso com Visita</div>
                             <div class="card-body">
-                                <h3>{{ totals.matriculas }}</h3>
+                                <h3>{{ entrada.matriculas }}</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col">
                         <div class="card text-center">
-                            <div class="card-header">PET</div>
+                            <div class="card-header"><i class="fas fa-flask"></i> PET</div>
                             <div class="card-body">
-                                <h3>{{ totals.garrafas }}</h3>
+                                <h3>{{ entrada.garrafas }}</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                </div>
+
+
+                 <!--HOMENS, MULHERES E CRIANÇAS-->
+                <div class="row">
+                    <div class="col">
                         <div class="card text-center">
-                            <div class="card-header">Homens</div>
+                            <div class="card-header"><i class="fas fa-male"></i> Homens</div>
                             <div class="card-body">
-                                <h3>{{ totals.homens }}</h3>
+                                <h3>{{ entrada.homens }}</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col">
                         <div class="card text-center">
-                            <div class="card-header">Mulheres</div>
+                            <div class="card-header"><i class="fas fa-female"></i> Mulheres</div>
                             <div class="card-body">
-                                <h3>{{ totals.mulheres }}</h3>
+                                <h3>{{ entrada.mulheres }}</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col">
                         <div class="card text-center">
-                            <div class="card-header">Crianças</div>
+                            <div class="card-header"><i class="fas fa-child"></i> Crianças</div>
                             <div class="card-body">
-                                <h3>{{ totals.criancas }}</h3>
+                                <h3>{{ entrada.criancas }}</h3>
                             </div>
                         </div>
                     </div>
@@ -122,13 +130,13 @@
         
         <!-- LISTA -->
         <div class="table table-bordered table-container">
-            {% if tabela_saida %}
-                {{ tabela_saida|safe }}
+            {% if tabela_entrada %}
+                {{ tabela_entrada|safe }}
             {% else %}
                 <div class="alert alert-info">Nenhum registro encontrado.</div>
             {% endif %}
         </div>
-    </div>
+    </div> 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

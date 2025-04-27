@@ -152,7 +152,7 @@ def visualizar_lista():
     global df_lista_sentenciados
     
     try:
-        totals = {
+        entrada = {
             'matriculas': df_lista_sentenciados['matricula'].count(),
             'garrafas': df_lista_sentenciados['garrafas'].replace('', pd.NA).fillna(0).astype(int).sum(),
             'homens': df_lista_sentenciados['homens'].replace('', pd.NA).fillna(0).astype(int).sum(),
@@ -169,9 +169,9 @@ def visualizar_lista():
         }
 
     # Convert DataFrame to HTML table with Bootstrap classes
-    tabela_html = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered')
+    tabela_entrada = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered')
 
-    return render_template('lista.html', tabela_saida=tabela_html, totals=totals)
+    return render_template('lista.html', tabela_entrada=tabela_entrada, entrada=entrada)
 
 
 
