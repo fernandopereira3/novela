@@ -6,122 +6,213 @@
     <title>SAIDA DE VISITANTES</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='../static/styles.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 </head>
 <body>
     <div class="header">
-        <img src="../static/img/penla.png" alt="Logo">
+        <a href="/"><img src="../static/img/penla.png" alt="Logo"></a>
         <h1><a href="/"></a></h1>
     </div>
+
     <nav class="nav-tabs">
         <div class="action-buttons">
-            <a href="/lista" class="btn btn-primary">
-                <i></i> ENTRADA
-            </a>
-            <a href="/saida" class="btn btn-primary" >
-                <i></i> SAIDA
-            </a>
+            <a href="/lista" class="btn btn-primary"><i></i> ENTRADA</a>
+            <a href="/saida" class="btn btn-primary"><i></i> SAIDA</a>
         </div>
     </nav>
 
-   <div class="card totals-card">
+    <div class="card totals-card" style="display: inline-block; width: 100%; border: 0cap;">
         <div class="card-header bg-secondary text-white">
-            <h5 class="card-title mb-0">Contagem dos Alojamentos <i class="bi bi-calculator"></i></h5>
+            <h5 class="card-title mb-0">Resumos<i class="bi bi-calculator"></i></h5>
         </div>
-        <div class="card-body">
-            <!-- Alojamento 1 -->
-            <div class="row">
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">1A</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_1a|default(0) }}</h3>
+
+         <!-- Card Alojamentos -->
+        <div class="col-4" style="display: inline-block; text-align: center; width: 30%;">
+            <div class="card-body">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Alojamentos<i class="bi bi-calculator"></i></h5>
+                </div>
+
+                <!-- Alojamento 1 -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">1A</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_1a|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">1B</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_1b|default(0) }}</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">1B</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_1b|default(0) }}</h3>
+
+                <!-- Alojamento 2 -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">2A</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_2a|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">2B</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_2b|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alojamento 3 -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">3A</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_3a|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">3B</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_3b|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alojamento 4 -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">4A</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_4a|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">4B</div>
+                            <div class="card-body">
+                                <h3>{{ totals.aloj_4b|default(0) }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOTAL -->
+                <div class="row">
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">TOTAL NA CASA</div>
+                            <div class="card-body">
+                                <h3>{{ totals.total|default(0) }}</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+      
+        <!-------PRESOS TRABALHANDO-->
+        <div class="col-4" style="display: inline-block; text-align: center; width: 60%;">
+           <div class="card-body">    
+                <div class="card-header bg-warning text-grey">
+                    <h5 class="card-title mb-0">Presos Trabalhando<i class="bi bi-calculator"></i></h5>
+                </div>
+                     <div class="table-overflow">
+                        {{ tab_trabalho|safe }}
+                            <style>
+                                .table-overflow {
+                                    max-height: 350px;
+                                    overflow-y: auto;
+                                }
+                            </style>
+                    </div>
+            </div>   
+        </div>
 
-            <!-- Alojamento 2 -->
-            <div class="row">
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">2A</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_2a|default(0) }}</h3>
+        
+             <!-- Card Visitas -->
+            <div class="row" style="display: inline-block; text-align: center; width: 60%;">
+                <div class="card-body">
+                    <div class="card-header bg-warning text-grey">
+                        <h5 class="card-title mb-0">Visitantes<i class="bi bi-calculator"></i></h5>
+                    </div>
+                        <div class="row">
+                                <div class="col">
+                                    <div class="card text-center">
+                                        <div class="card-header"><i class="fas fa-users"></i> Preso com Visita</div>
+                                        <div class="card-body">
+                                            <h3>{{ resumo.matriculas }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="col">
+                                <div class="card text-center">
+                                    <div class="card-header"><i class="fas fa-flask"></i> PET</div>
+                                    <div class="card-body">
+                                        <h3>{{ resumo.garrafas }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Homens, Mulheres e Crianças -->
+                        <div class="row">
+                            <div class="col">
+                                <div class="card text-center">
+                                    <div class="card-header"><i class="fas fa-male"></i> Homens</div>
+                                    <div class="card-body">
+                                        <h3>{{ resumo.homens }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card text-center">
+                                    <div class="card-header"><i class="fas fa-female"></i> Mulheres</div>
+                                    <div class="card-body">
+                                        <h3>{{ resumo.mulheres }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card text-center">
+                                    <div class="card-header"><i class="fas fa-child"></i> Crianças</div>
+                                    <div class="card-body">
+                                        <h3>{{ resumo.criancas }}</h3>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">2B</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_2b|default(0) }}</h3>
-                        </div>
-                    </div>
                 </div>
-            </div>
-
-            <!-- Alojamento 3 -->
-            <div class="row">
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">3A</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_3a|default(0) }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">3B</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_3b|default(0) }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Alojamento 4 -->
-            <div class="row">
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">4A</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_4a|default(0) }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">4B</div>
-                        <div class="card-body">
-                            <h3>{{ totals.aloj_4b|default(0) }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TOTAL -->
-            <div class="row">
-                <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">TOTAL NA CASA</div>
-                        <div class="card-body">
-                            <h3>{{ totals.total|default(0) }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Verificando tabela de trabalho...");
+            const tableElement = document.querySelector('#tabela-trabalho, .table');
+            if (tableElement) {
+                console.log("Tabela encontrada:", tableElement);
+                console.log("Número de linhas na tabela:", tableElement.querySelectorAll('tbody tr').length);
+            } else {
+                console.log("Tabela não encontrada!");
+                console.log("Conteúdo do container:", document.querySelector('.container').innerHTML);
+            }
+        });
+    </script>  
 </body>
 </html>

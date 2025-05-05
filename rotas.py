@@ -9,6 +9,8 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from main import app, db, PesquisaForm
+#from trabalho import df_trabalho
+from debug import *
 
 df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
 
@@ -264,8 +266,18 @@ def index():
         'aloj_4b': db.sentenciados.count_documents({'pavilhao': '4B'}),
         'total': db.sentenciados.count_documents({})
     }
+
+    resumo = {
+            'matriculas': df_lista_sentenciados['matricula'].count(),
+            'garrafas': df_lista_sentenciados['garrafas'].replace('', pd.NA).fillna(0).astype(int).sum(),
+            'homens': df_lista_sentenciados['homens'].replace('', pd.NA).fillna(0).astype(int).sum(),
+            'mulheres': df_lista_sentenciados['mulheres'].replace('', pd.NA).fillna(0).astype(int).sum(),
+            'criancas': df_lista_sentenciados['criancas'].replace('', pd.NA).fillna(0).astype(int).sum()
+        }
     
-    return render_template('index.html', totals=totals)
+
+
+    return render_template('index.html', totals=totals, resumo=resumo, trabalho=trabalho)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

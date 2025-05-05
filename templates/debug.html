@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Sistema de Novela</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        .debug-container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .debug-header {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+        }
+        .table-responsive {
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+        .card-header {
+            font-weight: bold;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+        .time-info {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        .debug-nav {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-film me-2"></i>Sistema Novela
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trabalho">Trabalho</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/debug">Debug</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container debug-container">
+        <!-- Debug Navigation -->
+        <div class="debug-nav">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    Opções de Debug
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <a href="/debug" class="btn btn-outline-primary">
+                                    <i class="fas fa-table me-2"></i>DataFrame na Memória
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <a href="/debug/trabalho/db" class="btn btn-outline-info">
+                                    <i class="fas fa-database me-2"></i>Dados no MongoDB
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <a href="/api/trabalho/raw" class="btn btn-outline-secondary">
+                                    <i class="fas fa-code me-2"></i>API JSON
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Content -->
+        <div class="debug-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-bug me-2"></i>Modo Debug</h2>
+                    <p class="mb-0">Informações detalhadas para desenvolvimento e diagnóstico</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="time-info">
+                        Data/Hora: <span id="current-datetime"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Content Injection from Python -->
+        <div id="debug-content">
+            {{ debug_content|safe }}
+        </div>
+
+        <!-- Export Options -->
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                Exportar Dados
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-grid gap-2">
+                            <a href="/export/trabalho/csv" class="btn btn-outline-success">
+                                <i class="fas fa-file-csv me-2"></i>Exportar CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">Sistema de Debug - Versão 1.0</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Date/Time Script -->
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-datetime').textContent = now.toLocaleString();
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Destacar tabelas para melhor legibilidade
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = document.querySelectorAll('.table');
+            tables.forEach(table => {
+                if (!table.classList.contains('table-striped')) {
+                    table.classList.add('table-striped', 'table-hover');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
