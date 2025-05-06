@@ -4,37 +4,38 @@ from flask import jsonify, request
 import json
 from bson import json_util
 from trabalho import *
+from rotas import *
 
 @app.route('/debug', methods=['GET'])
 def debug_trabalho():
     """Rota de debug para visualizar detalhes do DataFrame df_trabalho"""
     try:
         # Tentativa de acessar df_trabalho do escopo global
-        from trabalho import df_trabalho
+        from rotas import df_lista_sentenciados
         
         # [código existente para coletar informações]
         
         # Gerar HTML para o template em vez de retornar JSON
         html_output = f"""
         <div class="container debug-container">
-            <h2>Debug DataFrame df_trabalho</h2>
+            <h2>Debug DataFrame df_lista_sentenciados</h2>
             <div class="card">
                 <div class="card-header bg-info text-white">
                     Informações Básicas
                 </div>
                 <div class="card-body">
-                    <p><strong>Dimensões:</strong> {df_trabalho.shape[0]} linhas x {df_trabalho.shape[1]} colunas</p>
-                    <p><strong>Colunas:</strong> {', '.join(df_trabalho.columns)}</p>
+                    <p><strong>Dimensões:</strong> {df_lista_sentenciados.shape[0]} linhas x {df_lista_sentenciados.shape[1]} colunas</p>
+                    <p><strong>Colunas:</strong> {', '.join(df_lista_sentenciados.columns)}</p>
                     <p><strong>Tipos de dados:</strong></p>
                     <ul>
-                        {''.join([f'<li>{col}: {dtype}</li>' for col, dtype in df_trabalho.dtypes.items()])}
+                        {''.join([f'<li>{col}: {dtype}</li>' for col, dtype in df_lista_sentenciados.dtypes.items()])}
                     </ul>
                 </div>
             </div>
             
             <h3 class="mt-4">Conteúdo do DataFrame</h3>
             <div class="table-responsive">
-                {df_trabalho.to_html(classes='table table-striped table-sm', index=True)}
+                {df_lista_sentenciados.to_html(classes='table table-striped table-sm', index=True)}
             </div>
         </div>
         """
