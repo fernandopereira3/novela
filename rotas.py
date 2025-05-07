@@ -170,7 +170,6 @@ def visualizar_lista():
             'criancas': 0
         }
 
-    # Convert DataFrame to HTML table with Bootstrap classes
     tabela_entrada = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered')
 
     return render_template('lista.html', tabela_entrada=tabela_entrada, entrada=entrada)

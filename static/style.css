@@ -1,0 +1,77 @@
+*{ 
+   font-family: 'Open Sans', Arial, sans-serif;
+   margin: 0; 
+   padding: 0;
+   box-sizing: border-box;
+}
+
+body {
+   background-color: #ffffff;
+   color: #333;
+   margin: 0;
+   padding: 0;
+}
+
+ .bg-nav{
+   background-color: #f2f2f2;
+}
+
+.bg-main-card{
+   background-color: #ffffff;
+}
+
+
+ 
+
+                                                            /* FORMS */
+
+.table-striped-columns {
+   display: block;
+   margin: 20px auto;
+   border-radius: 3% ;
+   padding: 5px;
+   text-align: center;
+}
+
+.pesquisa-form{
+   display: block;
+   margin: 20px auto;
+   background-color: #f2f2f2;
+   border: 1px solid black;
+   border-radius: 3% ;
+   padding: 10px;
+   transform: translateX(1%);
+}
+
+                                                   /* table*/
+
+.table-container {
+   margin-top: 20px;
+   overflow-x: auto;
+   text-align: center;
+   border: 1px solid black;
+}
+.table-container th{
+   background-color: #f2f2f2;
+   text-align: center;
+}
+.totals-card {
+   margin-top: 20px;
+   margin-bottom: 20px;
+}
+.action-buttons {
+    margin-bottom: 20px;
+}
+
+.sort-btn {
+   background: none;
+   border: none;
+   color: #007bff;
+   padding: 0 5px;
+}
+.sort-btn:hover {
+   color: #0056b3;
+}
+th {
+   white-space: nowrap;
+}
