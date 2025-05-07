@@ -20,6 +20,11 @@ body {
    background-color: #ffffff;
 }
 
+.btn-primary{
+   background-color: #5f6163;
+   color: #fff;
+   border: none;
+}
 
  
 
@@ -44,24 +49,22 @@ body {
 }
 
                                                    /* table*/
+                                                   
+.table-bordered{
+   border: 0cap solid black;
+}
 
-.table-container {
-   margin-top: 20px;
-   overflow-x: auto;
+.table-bordered th{
    text-align: center;
-   border: 1px solid black;
+   color: #ffffff; 
+   background-color: #5f6163;
 }
-.table-container th{
-   background-color: #f2f2f2;
+
+.table-bordered td{
    text-align: center;
 }
-.totals-card {
-   margin-top: 20px;
-   margin-bottom: 20px;
-}
-.action-buttons {
-    margin-bottom: 20px;
-}
+
+
 
 .sort-btn {
    background: none;

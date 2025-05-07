@@ -125,6 +125,20 @@ def adicionar_lista(matricula):
     if sentenciado:
         data = request.get_json()
 
+        # Verificar se existe na coleção trab
+        setor_trabalho = None
+        try:
+            trabalho = db.trab.find_one({'matricula': matricula})
+            if not trabalho:
+                # Tentar buscar pelo nome se não encontrou pela matrícula
+                trabalho = db.trab.find_one({'nome': sentenciado['nome']})
+            
+            if trabalho:
+                setor_trabalho = trabalho.get('setor', 'Setor não especificado')
+        except Exception as e:
+            print(f"Erro ao verificar coleção trab: {str(e)}")
+
+        # Continuar com a adição normal
         garrafas = data.get('garrafas', 0)
         homens = data.get('homens', 0)
         mulheres = data.get('mulheres', 0)
@@ -144,9 +158,14 @@ def adicionar_lista(matricula):
 
         df_lista_sentenciados = pd.concat([df_lista_sentenciados, pd.DataFrame([new_row])], ignore_index=True)
 
-        return jsonify({'status': 'success', 'message': 'Adicionado com sucesso'})
-    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+        # Preparar a resposta
+        response = {'status': 'success', 'message': 'Adicionado com sucesso'}
+        if setor_trabalho:
+            response['tem_trabalho'] = True
+            response['setor'] = setor_trabalho
 
+        return jsonify(response)
+    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
 
 @app.route('/lista-selecionados', methods=['GET'])
@@ -170,7 +189,7 @@ def visualizar_lista():
             'criancas': 0
         }
 
-    tabela_entrada = df_lista_sentenciados.to_html(index=False, classes='table table-striped table-bordered')
+    tabela_entrada = df_lista_sentenciados.to_html(index=False, classes='table table-bordered')
 
     return render_template('lista.html', tabela_entrada=tabela_entrada, entrada=entrada)
 

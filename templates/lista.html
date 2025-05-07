@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAIDA DE VISITANTES</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-nav">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a href="/lista" class="btn btn-primary">
-                        <i></i> VOLTAR PARA PESQUISA
+                        <i>PESQUISAR</i>
                     </a>
                     <a href="/download" class="btn btn-warning">
                         <i></i> BAIXAR LISTA
@@ -29,29 +29,6 @@
                             <i></i> LIMPAR LISTA
                         </button>
                     </form>
-                    <script>
-                        function confirmClear(event) {
-                            if (confirm('ATENÇÃO: Esta ação irá remover todos os registros da lista. Deseja continuar?')) {
-                                return true;
-                            } else {
-                                event.preventDefault();
-                                return false;
-                            }
-                        }
-                    </script>           
-                    <script>
-                        async function handleSubmit(event) {
-                            event.preventDefault();
-                            const form = event.target;
-                            const response = await fetch(form.action, {
-                                method: 'POST',
-                                body: new FormData(form)
-                            });
-                            const message = await response.text();
-                            alert(message);
-                            return false;
-                        }
-                    </script>
                 </li>
                 <li class="nav-item active">
                     <a href="/debug"><img src="../static/img/penla.png" class="rounded float-right" alt="Logo" style="width: 250px; height: 50px; position: absolute; top: 0; right: 10px;"></a>
@@ -59,7 +36,7 @@
             </ul>
         </div>
     </nav>
-    <p> </p>
+    
     <div class="container">
         <h1 class="mt-4 mb-4">ENTRADA DE VISITANTES</h1>
         
@@ -78,7 +55,6 @@
             </div>
             
             <div class="card-body">
-                
                 <!-- PRESOS E PETS -->
                 <div class="row">
                     <div class="col">
@@ -99,8 +75,7 @@
                     </div>
                 </div>
 
-
-                 <!--HOMENS, MULHERES E CRIANÇAS-->
+                <!--HOMENS, MULHERES E CRIANÇAS-->
                 <div class="row">
                     <div class="col">
                         <div class="card text-center">
@@ -131,56 +106,118 @@
         </div>
         
         <!-- LISTA -->
-        <div class="table table-bordered table-container">
+        <div class="table table-bordered" style="width: 100%;">
             {% if tabela_entrada %}
-                {{ tabela_entrada|safe }}
+                <div id="tabela-wrapper">
+                    {{ tabela_entrada|safe }}
+                </div>
             {% else %}
                 <div class="alert alert-info">Nenhum registro encontrado.</div>
             {% endif %}
         </div>
-    </div> 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+
+    <!-- Scripts -->
     <script>
-        // Add JavaScript functionality
+        // Função para confirmar limpeza da lista
+        function confirmClear(event) {
+            if (confirm('ATENÇÃO: Esta ação irá remover todos os registros da lista. Deseja continuar?')) {
+                return true;
+            } else {
+                event.preventDefault();
+                return false;
+            }
+        }
+        
+        // Função para lidar com o envio do formulário de salvar lista
+        async function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            });
+            const message = await response.text();
+            alert(message);
+            return false;
+        }
+        
+        // Código para manipulação da tabela
         document.addEventListener('DOMContentLoaded', function() {
-            // Add delete functionality to each row
-            const table = document.querySelector('table');
-            if (table) {
-                // Add a new header column for actions
-                const headerRow = table.querySelector('thead tr');
-                if (headerRow) {
-                    // Add sort buttons to each header
-                    const headers = headerRow.querySelectorAll('th');
-                    headers.forEach((header, index) => {
-                        if (index < headers.length - 1) { 
-                            const headerText = header.textContent;
-                            header.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-center">
-                                    ${headerText}
-                                    <button class="btn btn-sm sort-btn" data-index="${index}">
-                                        <i class="fas fa-sort"></i>
-                                    </button>
-                                </div>
-                            `;
-                        }
-                    });
+            const tabela = document.querySelector('#tabela-wrapper table');
+            if (!tabela) return;
+            
+            // Adicionar classe para estilização
+            tabela.classList.add('table', 'table-bordered');
+            
+            // Obter o cabeçalho da tabela
+            const thead = tabela.querySelector('thead');
+            if (!thead) return;
+            
+            const headerRow = thead.querySelector('tr');
+            if (!headerRow) return;
+            
+            // Adicionar coluna de ações ao cabeçalho se não existir
+            let actionHeader = headerRow.querySelector('th:last-child');
+            if (!actionHeader || !actionHeader.textContent.includes('Ações')) {
+                actionHeader = document.createElement('th');
+                actionHeader.textContent = 'Ações';
+                headerRow.appendChild(actionHeader);
+            }
+            
+            // Adicionar botões de ordenação a cada coluna do cabeçalho (exceto a última - ações)
+            const headers = headerRow.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                // Não adicionar botão de ordenação à coluna de ações
+                if (index < headers.length - 1) {
+                    // Obter o texto original do cabeçalho
+                    const headerText = header.textContent.trim();
                     
-                    const actionHeader = document.createElement('th');
-                    actionHeader.textContent = 'Ações';
-                    headerRow.appendChild(actionHeader);
+                    // Criar o botão de ordenação
+                    const sortButton = document.createElement('button');
+                    sortButton.className = 'btn btn-sm sort-btn';
+                    sortButton.setAttribute('data-index', index);
+                    sortButton.innerHTML = '<i class="fas fa-sort"></i>';
+                    
+                    // Limpar o conteúdo do cabeçalho e adicionar o texto e o botão
+                    header.innerHTML = '';
+                    
+                    // Criar um container flex para alinhar o texto e o botão
+                    const container = document.createElement('div');
+                    container.className = 'd-flex justify-content-between align-items-center';
+                    
+                    // Adicionar o texto do cabeçalho
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = headerText;
+                    container.appendChild(textSpan);
+                    
+                    // Adicionar o botão de ordenação
+                    container.appendChild(sortButton);
+                    
+                    // Adicionar o container ao cabeçalho
+                    header.appendChild(container);
+                    
+                    // Adicionar evento de clique para ordenação
+                    sortButton.addEventListener('click', function() {
+                        sortTable(index);
+                    });
                 }
-                
-                // Add delete button to each row
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length > 0) {
-                        const matricula = cells[0].textContent.trim();
+            });
+            
+            // Adicionar botões de remoção a cada linha
+            const rows = tabela.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    const matricula = cells[0].textContent.trim();
+                    
+                    // Verificar se já existe uma célula de ação
+                    let actionCell = row.querySelector('td:last-child button.btn-danger');
+                    if (!actionCell) {
+                        // Criar célula de ação
+                        actionCell = document.createElement('td');
                         
-                        // Create action cell
-                        const actionCell = document.createElement('td');
-                        
-                        // Create delete button
+                        // Criar botão de remoção
                         const deleteBtn = document.createElement('button');
                         deleteBtn.className = 'btn btn-sm btn-danger';
                         deleteBtn.innerHTML = '<i class="bi bi-trash">remover</i>';
@@ -208,71 +245,64 @@
                         actionCell.appendChild(deleteBtn);
                         row.appendChild(actionCell);
                     }
-                });
-                
-                // Add sorting functionality
-                const sortButtons = document.querySelectorAll('.sort-btn');
-                sortButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const columnIndex = parseInt(this.getAttribute('data-index'));
-                        sortTable(columnIndex);
-                    });
-                });
-                
-                // Table sorting function
-                function sortTable(columnIndex) {
-                    const tbody = table.querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    
-                    // Determine current sort direction
-                    const currentIcon = sortButtons[columnIndex].querySelector('i');
-                    const isAscending = currentIcon.classList.contains('fa-sort') || 
-                                       currentIcon.classList.contains('fa-sort-down');
-                    
-                    // Update sort icons
-                    sortButtons.forEach(btn => {
-                        btn.querySelector('i').className = 'fas fa-sort';
-                    });
-                    
-                    currentIcon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
-                    
-                    // Sort the rows
-                    rows.sort((a, b) => {
-                        const aValue = a.querySelectorAll('td')[columnIndex].textContent.trim();
-                        const bValue = b.querySelectorAll('td')[columnIndex].textContent.trim();
-                        
-                        // Check if values are numbers
-                        const aNum = parseFloat(aValue);
-                        const bNum = parseFloat(bValue);
-                        
-                        if (!isNaN(aNum) && !isNaN(bNum)) {
-                            return isAscending ? aNum - bNum : bNum - aNum;
-                        } else {
-                            return isAscending 
-                                ? aValue.localeCompare(bValue, 'pt-BR') 
-                                : bValue.localeCompare(aValue, 'pt-BR');
-                        }
-                    });
-                    
-                    // Reappend sorted rows
-                    rows.forEach(row => tbody.appendChild(row));
                 }
+            });
+            
+            // Função para ordenar a tabela
+            window.sortTable = function(columnIndex) {
+                const tbody = tabela.querySelector('tbody');
+                if (!tbody) return;
+                
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                
+                // Determinar a direção da ordenação
+                const button = document.querySelector(`.sort-btn[data-index="${columnIndex}"]`);
+                if (!button) return;
+                
+                const icon = button.querySelector('i');
+                const isAscending = icon.classList.contains('fa-sort') || 
+                                   icon.classList.contains('fa-sort-down');
+                
+                // Atualizar ícones de ordenação
+                document.querySelectorAll('.sort-btn i').forEach(i => {
+                    i.className = 'fas fa-sort';
+                });
+                
+                icon.className = isAscending ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                
+                // Ordenar as linhas
+                rows.sort((a, b) => {
+                    const cells_a = a.querySelectorAll('td');
+                    const cells_b = b.querySelectorAll('td');
+                    
+                    if (cells_a.length <= columnIndex || cells_b.length <= columnIndex) {
+                        return 0;
+                    }
+                    
+                    const aValue = cells_a[columnIndex].textContent.trim();
+                    const bValue = cells_b[columnIndex].textContent.trim();
+                    
+                    // Verificar se são números
+                    const aNum = parseFloat(aValue);
+                    const bNum = parseFloat(bValue);
+                    
+                    if (!isNaN(aNum) && !isNaN(bNum)) {
+                        return isAscending ? aNum - bNum : bNum - aNum;
+                    } else {
+                        return isAscending 
+                            ? aValue.localeCompare(bValue, 'pt-BR') 
+                            : bValue.localeCompare(aValue, 'pt-BR');
+                    }
+                });
+                
+                // Reordenar as linhas na tabela
+                rows.forEach(row => tbody.appendChild(row));
             }
+            
+            // Ordenar inicialmente por nome (assumindo que é a coluna 1)
+            const colunaDeNome = 1; // Índice da coluna de nome
+            sortTable(colunaDeNome);
         });
     </script>
-    <style>
-        .sort-btn {
-            background: none;
-            border: none;
-            color: #007bff;
-            padding: 0 5px;
-        }
-        .sort-btn:hover {
-            color: #0056b3;
-        }
-        th {
-            white-space: nowrap;
-        }
-    </style>
 </body>
 </html>

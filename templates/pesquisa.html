@@ -68,7 +68,7 @@
         </div>
         <div class="col">
             {% if sentenciados %}
-            <table class="table table-bordered table-container" style="width: 80%;">
+            <table class="table table-bordered" style="width: 95%;">
                 <thead>
                     <tr>
                         <th scope="col">Matricula</th>
@@ -94,36 +94,61 @@
             {% endif %}
         </div>
     </div>
-
     <script>
+        // Função para adicionar sentenciado à lista
         function adicionar(matricula) {
-            const garrafas = document.getElementById('garrafas').value;
-            const homens = document.getElementById('homens').value;
-            const mulheres = document.getElementById('mulheres').value;
-            const criancas = document.getElementById('criancas').value;
-
+            // Obter valores dos inputs (adapte os IDs conforme necessário)
+              var nome = document.getElementById('nome').value;
+              var garrafas = document.getElementById('garrafas').value || 0;
+              var homens = document.getElementById('homens').value || 0;
+              var mulheres = document.getElementById('mulheres').value || 0;
+              var criancas = document.getElementById('criancas').value || 0;            
+            // Preparar dados para enviar
+            var dados = {
+                garrafas: garrafas,
+                homens: homens,
+                mulheres: mulheres,
+                criancas: criancas
+            };
+            
+            // Fazer a requisição AJAX usando fetch
             fetch('/adicionar/' + matricula, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    garrafas: garrafas,
-                    homens: homens,
-                    mulheres: mulheres,
-                    criancas: criancas
-                })
+                body: JSON.stringify(dados)
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                // Verificar se houve sucesso
                 if (data.status === 'success') {
-                    alert('Adicionado com sucesso!');
-                    window.location.href = '/lista-selecionados';
+                    // Verificar se o sentenciado tem trabalho alocado
+                    if (data.tem_trabalho) {
+                        alert("ATENÇÃO: este sentenciado está TRABALHANDO na " + data.setor);                    }
+                    
+                    // Mostrar mensagem de sucesso
+                    alert(data.message);
+                    
+                    // Atualizar a página após um pequeno atraso
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
                 } else {
-                    alert('Erro ao adicionar: ' + data.message);
+                    // Mostrar mensagem de erro
+                    alert(data.message);
                 }
+            })
+            .catch(function(error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar a requisição');
             });
+            
+            // Impedir comportamento padrão do botão/formulário
+            return false;
         }
-    </script>
+        </script>
 </body>
 </html>

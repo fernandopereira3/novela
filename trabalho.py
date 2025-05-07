@@ -30,7 +30,7 @@ def construir_tabela_html():
             if documentos:
                 # Iniciar a tabela com cabeçalhos
                 html = """
-                 <table class="table table-striped table-bordered" id="tabela-trabalho">
+                 <table class="table table-striped" id="tabela-trabalho">
                   <thead>
                     <tr>
                       <th>Matrícula</th>
