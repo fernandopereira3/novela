@@ -30,11 +30,13 @@
                         </button>
                     </form>
                 </li>
+            </ul>
+            <ul>
                 <li class="nav-item active">
-                    <a href="#" onclick="return promptPassword()"><img src="../static/img/penla.png" class="rounded float-right" alt="Logo" style="width: 250px; height: 50px; position: absolute; top: 0; right: 10px;"></a>
+                    <a href="#" onclick="return promptPassword()"><img src="../static/img/penla.png" class="rounded" alt="Logo"></a>
                     <script>
                         function promptPassword() {
-                            var password = prompt("Não tem nada aqui !");
+                            var password = prompt("Informe a senha para acessar:");
                             if (password === atob("MDIwMjMwOTE=")) {
                                 window.location.href = "/debug";
                                 return false;
@@ -44,8 +46,8 @@
                             }
                         }
                     </script>
-                </li>       
-            </ul>
+                </li>
+            </ul> 
         </div>
     </nav>
     
@@ -62,7 +64,7 @@
         
         <!-- RESUMO -->
         <div class="card totals-card justify-content-center">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-card text-white">
                 <h5 class="card-title mb-0">Resumo</h5>
             </div>
             
