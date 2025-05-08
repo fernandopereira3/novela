@@ -1,1 +1,0 @@
-Start-Process -FilePath "python" -ArgumentList "C:\caminho\para\novela\main.py" -WindowStyle Hidden
