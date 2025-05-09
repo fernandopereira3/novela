@@ -63,7 +63,7 @@ def construir_tabela_html():
                 """
                 return html
             else:
-                return "<p>Não há dados de trabalho disponíveis</p>"
+                return "<p>Esta função esta desativada, o banco de dados não foi sincronizado com o SIA. Favor verificar! </p>"
         else:
             return "<p>Coleção de trabalho não encontrada</p>"
     except Exception as e:

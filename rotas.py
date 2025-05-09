@@ -9,10 +9,14 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from main import app, db, PesquisaForm
-#from trabalho import df_trabalho
+from flask import render_template, request, redirect, url_for, session, flash
+from werkzeug.security import check_password_hash
 from debug import *
 
 df_lista_sentenciados = pd.DataFrame(columns=['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao'])
+## app.secret_key = ''
+
+
 
 @app.route('/lista', methods=['GET', 'POST'])
 def pesquisa_matricula():
@@ -268,6 +272,35 @@ def salvar_lista_no_banco():
     
     except Exception as e:
         return jsonify({f'Erro ao salvar no banco de dados: {str(e)}'})    
+
+## LOGIN ##
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user = db.usuarios.find_one({'username': username})
+        
+        if user and check_password_hash(user['password'], password):
+            session['user'] = username
+            session['role'] = user['role']
+            return redirect(url_for('index'))
+        
+        flash('Usuário ou senha inválidos')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+
+## LOGIN ##
+
+
+
 
 
 @app.route('/')
