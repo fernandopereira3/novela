@@ -29,7 +29,7 @@ if (Test-Path ".\requirements.txt") {
 }
 
 Write-Host "Starting novela application..." -ForegroundColor Green
-Start-Process -FilePath "python" -ArgumentList "D:\repositorios-github\novela\main.py" -WindowStyle Hidden
+Start-Process -FilePath "python" -ArgumentList "C:\novela-main\src\main.py" -WindowStyle Hidden
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Application exited with code $LASTEXITCODE" -ForegroundColor Red
