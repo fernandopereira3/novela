@@ -25,11 +25,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest ruff
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install flask flask-pymongo flask-wtf; fi
     
-    - name: Lint with flake8
+    - name: Lint files
       run: |
+        ruff format .
         flake8 rotas.py --count --select=E9,F63,F7 --show-source --statistics
         flake8 rotas_saida.py --count --select=E9,F63,F7--show-source --statistics
         flake8 main.py --count --select=E9,F63,F7--show-source --statistics
