@@ -6,15 +6,16 @@ from bson import json_util
 from trabalho import *
 from rotas import *
 
+
 @app.route('/debug', methods=['GET'])
 def debug_trabalho():
     """Rota de debug para visualizar detalhes do DataFrame df_trabalho"""
     try:
         # Tentativa de acessar df_trabalho do escopo global
         from rotas import df_lista_sentenciados
-        
+
         # [código existente para coletar informações]
-        
+
         # Gerar HTML para o template em vez de retornar JSON
         html_output = f"""
         <div class="container debug-container">
@@ -39,9 +40,9 @@ def debug_trabalho():
             </div>
         </div>
         """
-        
+
         return render_template('debug.html', debug_content=html_output)
-        
+
     except Exception as e:
         error_html = f"""
         <div class="alert alert-danger">
@@ -51,6 +52,7 @@ def debug_trabalho():
         """
         return render_template('debug.html', debug_content=error_html)
 
+
 @app.route('/debug/trabalho/db', methods=['GET'])
 def debug_trabalho_db():
     """Rota de debug para visualizar dados diretamente do banco de dados"""
@@ -58,49 +60,49 @@ def debug_trabalho_db():
         # Verifica se a coleção existe
         colecoes = db.list_collection_names()
         tem_colecao = 'trab' in colecoes
-        
+
         # Informações sobre o banco de dados
         db_info = {
-            "database_name": db.name,
-            "collections": colecoes,
-            "trabalho_collection_exists": tem_colecao
+            'database_name': db.name,
+            'collections': colecoes,
+            'trabalho_collection_exists': tem_colecao,
         }
-        
+
         # Se a coleção existir, recupera seus dados e estatísticas
         if tem_colecao:
             # Conta documentos
             count = db.trab.count_documents({})
-            
+
             # Obtém amostra de documentos (limita a 100 para evitar sobrecarga)
             documentos = list(db.trab.find({}).limit(150))
-            
+
             # Pega o primeiro documento para analisar a estrutura (se houver)
             primeiro_doc = db.trab.find_one({})
             estrutura = {}
-            
+
             if primeiro_doc:
                 for campo, valor in primeiro_doc.items():
                     if campo != '_id':  # Ignora o campo _id do MongoDB
                         estrutura[campo] = type(valor).__name__
-            
+
             # Converte dados do MongoDB para DataFrame para análise
             df_temp = pd.DataFrame(documentos)
             if '_id' in df_temp.columns:
                 df_temp = df_temp.drop(columns=['_id'])
-            
+
             # Saída para o console
-            print("\n===== DEBUG MONGODB TRABALHO =====")
-            print(f"Banco de dados: {db.name}")
-            print(f"Coleções: {colecoes}")
+            print('\n===== DEBUG MONGODB TRABALHO =====')
+            print(f'Banco de dados: {db.name}')
+            print(f'Coleções: {colecoes}')
             print(f"Documentos na coleção 'trabalho': {count}")
-            print("\nEstrutura do documento:")
+            print('\nEstrutura do documento:')
             for campo, tipo in estrutura.items():
-                print(f"  - {campo}: {tipo}")
-            print("\nPrimeiros 5 documentos:")
+                print(f'  - {campo}: {tipo}')
+            print('\nPrimeiros 5 documentos:')
             if not df_temp.empty:
                 print(df_temp.head())
-            print("============================\n")
-            
+            print('============================\n')
+
             # HTML para visualização
             html_output = f"""
             <div class="container debug-container">
@@ -147,9 +149,9 @@ def debug_trabalho_db():
                 </div>
             </div>
             """
-            
+
             return render_template('debug.html', debug_content=html_output)
-        
+
         else:
             # Se a coleção não existir
             html_output = f"""
@@ -162,7 +164,7 @@ def debug_trabalho_db():
             </div>
             """
             return render_template('debug.html', debug_content=html_output)
-    
+
     except Exception as e:
         # Em caso de erro
         error_html = f"""
@@ -175,6 +177,7 @@ def debug_trabalho_db():
         """
         return render_template('debug.html', debug_content=error_html)
 
+
 @app.route('/api/trabalho/stats', methods=['GET'])
 def api_trabalho_stats():
     """Rota que fornece estatísticas sobre a coleção trabalho"""
@@ -182,36 +185,47 @@ def api_trabalho_stats():
         if 'trabalho' in db.list_collection_names():
             # Obtém todos os documentos
             df_temp = pd.DataFrame(list(db.trab.find({}, {'_id': 0})))
-            
+
             if not df_temp.empty:
                 # Calcular estatísticas básicas
                 stats = {
-                    "count": len(df_temp),
-                    "columns": df_temp.columns.tolist(),
-                    "null_counts": df_temp.isnull().sum().to_dict()
+                    'count': len(df_temp),
+                    'columns': df_temp.columns.tolist(),
+                    'null_counts': df_temp.isnull().sum().to_dict(),
                 }
-                
+
                 # Adicionar estatísticas numéricas se houver colunas numéricas
-                num_cols = df_temp.select_dtypes(include=['number']).columns.tolist()
+                num_cols = df_temp.select_dtypes(
+                    include=['number']
+                ).columns.tolist()
                 if num_cols:
-                    stats["numeric_stats"] = json.loads(df_temp[num_cols].describe().to_json())
-                
+                    stats['numeric_stats'] = json.loads(
+                        df_temp[num_cols].describe().to_json()
+                    )
+
                 # Contar valores únicos para colunas categóricas (limitado a 20 valores únicos)
                 for col in df_temp.columns:
                     if df_temp[col].nunique() < 20:
-                        stats[f"{col}_value_counts"] = df_temp[col].value_counts().to_dict()
-                
-                return jsonify({
-                    "status": "success",
-                    "statistics": stats
-                })
+                        stats[f'{col}_value_counts'] = (
+                            df_temp[col].value_counts().to_dict()
+                        )
+
+                return jsonify({'status': 'success', 'statistics': stats})
             else:
-                return jsonify({"status": "success", "message": "Coleção vazia"})
+                return jsonify(
+                    {'status': 'success', 'message': 'Coleção vazia'}
+                )
         else:
-            return jsonify({"status": "error", "message": "Coleção 'trabalho' não encontrada"})
+            return jsonify(
+                {
+                    'status': 'error',
+                    'message': "Coleção 'trabalho' não encontrada",
+                }
+            )
     except Exception as e:
-        print(f"Error in api_trabalho_stats: {str(e)}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f'Error in api_trabalho_stats: {str(e)}')
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 @app.route('/api/trabalho/raw', methods=['GET'])
 def api_trabalho_raw():
@@ -219,31 +233,41 @@ def api_trabalho_raw():
     try:
         limit = request.args.get('limit', default=100, type=int)
         skip = request.args.get('skip', default=0, type=int)
-        
+
         if 'trab' in db.list_collection_names():
             # Obtém os documentos com paginação
             documentos = list(db.trab.find({}).skip(skip).limit(limit))
-            
+
             # Contagem total para informações de paginação
             total = db.trab.count_documents({})
-            
+
             # Converte ObjectId para string
             json_data = json.loads(json_util.dumps(documentos))
-            
-            return jsonify({
-                "status": "success",
-                "total": total,
-                "limit": limit,
-                "skip": skip,
-                "data": json_data
-            })
+
+            return jsonify(
+                {
+                    'status': 'success',
+                    'total': total,
+                    'limit': limit,
+                    'skip': skip,
+                    'data': json_data,
+                }
+            )
         else:
-            return jsonify({"status": "error", "message": "Coleção 'trabalho' não encontrada"})
+            return jsonify(
+                {
+                    'status': 'error',
+                    'message': "Coleção 'trabalho' não encontrada",
+                }
+            )
     except Exception as e:
-        print(f"Error in api_trabalho_raw: {str(e)}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print(f'Error in api_trabalho_raw: {str(e)}')
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @app.route('/test_debug')
 def test_debug():
-    return render_template('debug.html', debug_content='<div class="alert alert-success">Teste funcionando!</div>')
+    return render_template(
+        'debug.html',
+        debug_content='<div class="alert alert-success">Teste funcionando!</div>',
+    )

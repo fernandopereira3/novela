@@ -14,10 +14,11 @@ try:
     mongo = PyMongo(app)
     db = mongo.db
     mongo.db.command('ping')
-    print("Conectado ao MongoDB com sucesso!")
+    print('Conectado ao MongoDB com sucesso!')
 except Exception as e:
-    print(f"Erro ao conectar ao MongoDB: {e}")
+    print(f'Erro ao conectar ao MongoDB: {e}')
     exit(1)
+
 
 class PesquisaForm(FlaskForm):
     matricula = StringField('Matrícula')
