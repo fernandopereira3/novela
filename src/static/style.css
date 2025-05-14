@@ -72,10 +72,21 @@ body {
    transform: translateX(1%);
 }
 
+.form-row{
+   display: block;
+   margin: 20px auto;
+   background-color: #f2f2f2;
+   border: 1px solid black;
+   border-radius: 3% ;
+   padding: 10px;
+   transform: translateX(1%);
+}
+
                                                    /* table*/
                                                    
 .table-bordered{
    border: 0cap solid black;
+   border-radius: 5%;
 }
 
 .table-bordered th{

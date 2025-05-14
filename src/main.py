@@ -3,6 +3,7 @@ import os
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
+from jumbo import *
 
 
 app = Flask(__name__, instance_relative_config=True)
@@ -32,6 +33,7 @@ class PesquisaForm(FlaskForm):
 
 from rotas import *
 from rotas_saida import *
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
