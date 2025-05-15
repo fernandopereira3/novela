@@ -16,6 +16,16 @@
                     <a href="/" class="btn btn-primary">
                         <i>INICIO</i>
                     </a>
+                    <a href="{{ url_for('download_visitas_pdf') }}" class="btn btn-primary">
+                        <i class="fas fa-file-pdf"></i> DOWNLOAD
+                    </a>
+                    <form method="POST" style="display: inline;">
+                        <button type="submit" name="limpar_lista" class="btn btn-danger" 
+                        onclick="return confirm('Tem certeza que deseja limpar toda a lista?')">
+                    <i class="fas fa-trash-alt"></i> LIMPAR LISTA
+                        </button>
+                    </form>
+                </li>
             </ul>
             <ul>
                 <li class="nav-item active">
@@ -38,44 +48,94 @@
     </nav>
     <!----FIM DO HEADER-->
     <!----FORM-->
-<div class="col-6">
-        <form method="POST" class="form-row" style="width: 80%;">
-            {{ form.csrf_token }}
+    <div class="col-6">
+    <form method="POST" class="form-row" style="width: 80%; margin-left: 400px;">
+        {{ form.csrf_token }}
+        <div class="d-flex flex-column gap-2">
             <div class="d-flex gap-2">
-                <div class="col-2 form-floating mb-3 mt-3">
-                    <input type="text" class="form-control" id="matricula" placeholder="Matricula" name="matricula">
+                <div class="col-2 form-floating">
+                    <input type="text" class="form-control" id="matricula" 
+                        placeholder="Matricula" name="matricula" 
+                        value="{{ form.matricula.data if form.matricula.data }}">
                     <label for="matricula">{{ form.matricula.label }}</label>
                 </div>
-                <div class="col form-floating mb-3 mt-3">
-                    <input type="text" class="form-control" id="nome" placeholder="Nome" name="nome">
+                <div class="col form-floating">
+                    <input type="text" class="form-control" id="nome" 
+                        placeholder="Nome" name="nome" 
+                        value="{{ form.nome.data if form.nome.data }}">
                     <label for="nome">{{ form.nome.label }}</label>   
                 </div>
-            </div> 
+            </div>
             <div class="d-flex gap-3">
-                <div class="col form-floating mb-3 mt-3">
-                    <input type="text" class="form-control" id="homens" placeholder="Homens" name="homens">
-                    <label for="homens">{{ form.homens.label }}</label>
+                <div class="col form-floating">
+                    <input type="text" class="form-control" id="visita" placeholder="Visitante" name="visita">
+                    <label for="visita">Nome do Visitante</label>
                 </div>
-                <div class="col-3 form-floating mb-3 mt-3">
+                <div class="col-3 form-floating">
                     <select class="form-select" id="parentesco" name="parentesco">
                         <option selected>Amasia</option>
-                        <option value="1">Mae</option>
-                        <option value="2">Pai</option>
-                        <option value="3">Filho(a)</option>
-                        <option value="4">Esposa</option>
+                        <option value="Mae">Mae</option>
+                        <option value="Pai">Pai</option>
+                        <option value="Filho(a)">Filho(a)</option>
+                        <option value="Esposa">Esposa</option>
                     </select>
                     <label for="parentesco">Parentesco</label>
                 </div>
             </div>
-            <div>
-                <button type="submit" class="btn btn-primary">Adicionar</button>
+            <div><div class="d-flex gap-2">
+                <button type="submit" name="pesquisar" class="btn btn-primary">Pesquisar</button>
+                <button type="submit" name="adicionar" class="btn btn-success">Adicionar Visita</button>
             </div>
-        </form>
+            </div>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+    </form>
+</div>
+<!--FIM DO FORM--->
+<!----TABELA--->
+<div class="mt-4">
+    <table class="table table-bordered" style="width: 96%; margin-left: 20px;">
+            <thead>
+        <tr>
+            <th>Matrícula</th>
+            <th>Nome</th>
+            <th>Visitante</th>
+            <th>Parentesco</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for visita in visitas %}
+        <tr>
+            <td>{{ visita.matricula }}</td>
+            <td>{{ visita.nome }}</td>
+            <td>{{ visita.visitante }}</td>
+            <td>{{ visita.parentesco }}</td>
+            <td>
+                <form method="POST" style="display: inline;">
+                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                    <button type="submit" name="remover" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Remover
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-
-
-
+<!--FIM DA TABELA--->
 
 
 
