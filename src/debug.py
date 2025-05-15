@@ -59,17 +59,17 @@ def debug_trabalho_db():
     try:
         # Verifica se a coleção existe
         colecoes = db.list_collection_names()
-        tem_colecao = 'trab' in colecoes
+        trab = 'trab' in colecoes
 
         # Informações sobre o banco de dados
         db_info = {
             'database_name': db.name,
             'collections': colecoes,
-            'trabalho_collection_exists': tem_colecao,
+            'trabalho_collection_exists': trab,
         }
 
         # Se a coleção existir, recupera seus dados e estatísticas
-        if tem_colecao:
+        if trab:
             # Conta documentos
             count = db.trab.count_documents({})
 
@@ -109,7 +109,7 @@ def debug_trabalho_db():
                 <h2>Debug MongoDB - Coleção 'trabalho'</h2>
                 
                 <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-body bg-primary text-white">
                         Informações do Banco de Dados
                     </div>
                     <div class="card-body">
@@ -235,31 +235,33 @@ def api_trabalho_raw():
         skip = request.args.get('skip', default=0, type=int)
 
         if 'trab' in db.list_collection_names():
-            # Obtém os documentos com paginação
+
             documentos = list(db.trab.find({}).skip(skip).limit(limit))
 
-            # Contagem total para informações de paginação
             total = db.trab.count_documents({})
 
-            # Converte ObjectId para string
             json_data = json.loads(json_util.dumps(documentos))
-
             return jsonify(
                 {
                     'status': 'success',
-                    'total': total,
-                    'limit': limit,
-                    'skip': skip,
+                    'pagination': {
+                        'total_records': total,
+                        'records_per_page': limit,
+                        'current_offset': skip,
+                        'current_page': skip // limit + 1,
+                        'total_pages': -(-total // limit)
+                    },
                     'data': json_data,
                 }
-            )
+            ), {'indent': 2}
         else:
             return jsonify(
                 {
                     'status': 'error',
                     'message': "Coleção 'trabalho' não encontrada",
                 }
-            )
+            ), {'indent': 2}
+        
     except Exception as e:
         print(f'Error in api_trabalho_raw: {str(e)}')
         return jsonify({'status': 'error', 'message': str(e)}), 500

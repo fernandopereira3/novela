@@ -82,7 +82,13 @@
         </div>
         <div class="col">
             {% if sentenciados %}
-            <table class="table table-bordered" style="width: 96%;">
+            <table class="table table-overflow" style="width: 96%;">
+                 <style>
+                    .table-overflow {
+                        max-height: 30px;
+                        overflow-y: auto;
+                    }
+                </style>
                 <thead>
                     <tr>
                         <th scope="col">Matricula</th>
@@ -164,5 +170,11 @@
             return false;
         }
         </script>
+<!-- Footer -->
+<footer class="py-3 my-4">
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3"> </ul>
+    <p class="text-center text-body-secondary">© 2025 Fernando Pereira - Versão: 0.64</p>
+</footer>
+<!-- Final Footer -->
 </body>
 </html>
