@@ -64,6 +64,12 @@ def jumbo():
             elif 'adicionar' in request.form:
                 matricula = request.form.get('matricula')
                 visitante = request.form.get('visita')
+                nome = request.form.get('nome')
+                parentesco = request.form.get('parentesco')
+
+                if not all([matricula, visitante, nome, parentesco]):
+                    flash('Todos os campos devem ser preenchidos', 'error')
+                    return redirect(url_for('jumbo'))
 
                 existing_mongo = db.visita.find_one(
                     {'matricula': matricula, 'visitante': visitante}
@@ -71,9 +77,9 @@ def jumbo():
 
                 nova_visita = {
                     'matricula': matricula,
-                    'nome': request.form.get('nome'),
+                    'nome': nome,
                     'visitante': visitante,
-                    'parentesco': request.form.get('parentesco'),
+                    'parentesco': parentesco,
                     'data_visita': pd.Timestamp.now(),
                 }
 
@@ -90,7 +96,7 @@ def jumbo():
                         'Visita registrada com sucesso no histórico permanente',
                         'success',
                     )
-
+                    
             elif 'remover' in request.form:
                 index = int(request.form.get('index'))
                 df_visitas = df_visitas.drop(index).reset_index(drop=True)

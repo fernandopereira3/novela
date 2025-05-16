@@ -16,6 +16,9 @@
                     <a href="/" class="btn btn-primary">
                         <i>INICIO</i>
                     </a>
+                    <a href="/lista" class="btn btn-primary">
+                        <i>PESQUISAR SENT.</i>
+                    </a>
                     <a href="{{ url_for('download_visitas_pdf') }}" class="btn btn-primary">
                         <i class="fas fa-file-pdf"></i> DOWNLOAD
                     </a>
@@ -49,7 +52,7 @@
     <!----FIM DO HEADER-->
     <!----FORM-->
     <div class="col-6">
-    <form method="POST" class="form-row" style="width: 70%; margin-left: 600px;">
+    <form method="POST" class="form-row" style="width: 80%; margin-left: 100px;">
         {{ form.csrf_token }}
         <div class="d-flex flex-column gap-2">
             <div class="d-flex gap-2">
@@ -138,6 +141,7 @@
     </table>
 </div>
 <!--FIM DA TABELA--->
+
 <!-- Footer -->
 <footer class="py-3 my-4">
     <ul class="nav justify-content-center border-bottom pb-3 mb-3"> </ul>

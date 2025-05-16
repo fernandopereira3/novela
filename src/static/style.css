@@ -13,8 +13,9 @@ body {
 }
 
  .bg-nav{
-   background-color: #b3b6b8;
+   background-color: #ffffff;
    min-height: 70px;
+   border-bottom: 1px solid #ccc;
 }
 
 .bg-main-card{
@@ -44,14 +45,14 @@ body {
 }
 
 .card{
-   border: 1px, solid, #b3b6b8; 
+   border: 1px, solid, #f2f2f2; 
    border-radius: 5px;
 }
 
 .bg-card{
-   background-color: #b3b6b8;
+   background-color: #f2f2f2;
    color: #fff;
-   border: none;
+   border: 1px solid #f2f2f2;
 }
 
 .navbar-nav{
@@ -107,8 +108,8 @@ body {
 
 .table-bordered th{
    text-align: center;
-   color: #ffffff; 
-   background-color: #b3b6b8;
+   color: #333333; 
+   background-color: #f2f2f2;
 }
 
 .table-bordered td{
