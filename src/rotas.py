@@ -64,13 +64,25 @@ def pesquisa_matricula():
 
 @app.route('/download', methods=['GET'])
 def download_pdf():
-    global df_lista_sentenciados
-
+    # Get data from MongoDB collection instead of global variable
+    collection = db['lista_sentenciados']
+    records = list(collection.find({}, {'_id': 0}))  # Exclude MongoDB _id field
+    
+    # Convert MongoDB records to DataFrame
+    if not records:
+        # Return empty DataFrame with expected columns if no records
+        df_data = pd.DataFrame(
+            columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao']
+        )
+    else:
+        df_data = pd.DataFrame(records)
+    
+    # Sort data if requested
     sort_by = request.args.get('sort', 'nome')
     df_sorted = (
-        df_lista_sentenciados.sort_values(by=sort_by)
-        if sort_by in df_lista_sentenciados.columns
-        else df_lista_sentenciados
+        df_data.sort_values(by=sort_by)
+        if sort_by in df_data.columns
+        else df_data
     )
 
     buffer = io.BytesIO()
@@ -86,22 +98,22 @@ def download_pdf():
 
     try:
         totals = {
-            'garrafas': df_lista_sentenciados['garrafas']
+            'garrafas': df_data['garrafas']
             .replace('', pd.NA)
             .fillna(0)
             .astype(int)
             .sum(),
-            'homens': df_lista_sentenciados['homens']
+            'homens': df_data['homens']
             .replace('', pd.NA)
             .fillna(0)
             .astype(int)
             .sum(),
-            'mulheres': df_lista_sentenciados['mulheres']
+            'mulheres': df_data['mulheres']
             .replace('', pd.NA)
             .fillna(0)
             .astype(int)
             .sum(),
-            'criancas': df_lista_sentenciados['criancas']
+            'criancas': df_data['criancas']
             .replace('', pd.NA)
             .fillna(0)
             .astype(int)
@@ -133,36 +145,11 @@ def download_pdf():
 
     table_nomes.setStyle(style)
 
-    summary_data = [
-        ['Resumo', 'Total'],
-        ['Garrafas', str(totals['garrafas'])],
-        ['Homens', str(totals['homens'])],
-        ['Mulheres', str(totals['mulheres'])],
-        ['Crianças', str(totals['criancas'])],
-    ]
-
-    summary_table = Table(summary_data, colWidths=[60, 60])
-    summary_table.setStyle(
-        TableStyle(
-            [
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 8),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-                ('TOPPADDING', (0, 0), (-1, -1), 4),
-                ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-                ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-            ]
-        )
-    )
-
     elements.append(table_nomes)
     elements.append(
         Paragraph('<br/><br/><br/>', getSampleStyleSheet()['Normal'])
     )
-    elements.append(summary_table)
+ 
     elements.append(
         Paragraph(
             '<br/><br/><br/>_____________________________<br/>Assinatura do Responsável',
@@ -179,6 +166,7 @@ def download_pdf():
         download_name=f'lista_{datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")}.pdf',
         mimetype='application/pdf',
     )
+
 
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
