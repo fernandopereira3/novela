@@ -17,35 +17,21 @@
                         <i>INICIO</i>
                     </a>
                     <a href="/lista" class="btn btn-primary">
-                        <i>PESQUISAR SENT.</i>
+                        <i class="">PESQUISAR SENT.</i>
                     </a>
                     <a href="{{ url_for('download_visitas_pdf') }}" class="btn btn-primary">
-                        <i class="fas fa-file-pdf"></i> DOWNLOAD
+                        <i>DOWNLOAD</i>
                     </a>
                     <form method="POST" style="display: inline;">
                         <button type="submit" name="limpar_lista" class="btn btn-danger" 
                         onclick="return confirm('Tem certeza que deseja limpar toda a lista?')">
-                    <i class="fas fa-trash-alt"></i> LIMPAR LISTA
-                        </button>
+                        <i>LIMPAR LISTA</i>
+                    </button>
                     </form>
                 </li>
             </ul>
             <ul>
-                <li class="nav-item active">
-                    <a href="#" onclick="return promptPassword()"><img src="../static/img/penla.png" class="rounded" alt="Logo"></a>
-                    <script>
-                        function promptPassword() {
-                            var password = prompt("Informe a senha para acessar:");
-                            if (password === atob("MDIwMjMwOTE=")) {
-                                window.location.href = "/debug";
-                                return false;
-                            } else {
-                                alert("Senha incorreta!");
-                                return false;
-                            }
-                        }
-                    </script>
-                </li>
+                <a href="/"><img src="../static/img/penla.png" class="rounded" alt="Logo"></a>
             </ul> 
         </div>
     </nav>
@@ -144,8 +130,27 @@
 
 <!-- Footer -->
 <footer class="py-3 my-4">
-    <ul class="nav justify-content-center border-bottom pb-3 mb-3"> </ul>
-    <p class="text-center text-body-secondary">© 2025 Fernando Pereira - Versão: 0.64</p>
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-muted" onclick="return promptPassword()">Admin Page</a>
+            <script>
+                function promptPassword() {
+                    var password = prompt("Por favor, digite a senha de acesso:");
+                    if (password === atob("MDIwMjMwOTE=")) {
+                        window.location.href = "/debug";
+                        return false;
+                    } else {
+                        alert("Senha inválida. Tente novamente.");
+                        return false;
+                    }
+                }
+            </script>
+        </li>
+        <li>
+            <a href="" class="nav-link px-2 text-muted">Outros Links</a>
+        </li>
+    </ul>
+    <p class="text-center text-body-secondary">&copy; 2025 Fernando Pereira | Versão: 0.64</p>
 </footer>
 <!-- Final Footer -->
 </body>
