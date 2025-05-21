@@ -36,7 +36,7 @@ df_lista_sentenciados = pd.DataFrame(
 ## app.secret_key = ''
 
 
-@app.route('/lista', methods=['GET', 'POST'])
+@app.route('/pesquisa', methods=['GET', 'POST'])
 def pesquisa_matricula():
     form = PesquisaForm()
     sentenciados = db.sentenciados
@@ -224,7 +224,7 @@ def adicionar_lista(matricula):
     return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
 
-@app.route('/lista-selecionados', methods=['GET'])
+@app.route('/lista', methods=['GET'])
 def visualizar_lista():
     global df_lista_sentenciados
 
