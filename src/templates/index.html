@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SISUNI - CPPPAC</title>
-    
-    <!-- Favicons otimizados -->
-    <link rel="icon" href="{{ url_for('static', filename='../img/sp.png') }}" type="image/png">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='../img/sp.png') }}" type="image/png">
-
-    <!-- Stylesheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/sp.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Font Awesome (já estava carregado) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
 
 <body>
@@ -22,14 +20,14 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="sentenciadosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-tie"></i> SENTENCIADOS
+                        <i class="bi bi-yin-yang"></i> SENTENCIADOS
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="sentenciadosDropdown">
-                        <li><a class="dropdown-item" href="/dcadastro">Cadastrar</a></li>
-                        <li><a class="dropdown-item" href="/d_editar">Editar</a></li>
+                        <li><a class="dropdown-item" href="#">Cadastrar</a></li>
+                        <li><a class="dropdown-item" href="#">Editar</a></li>
                         <li><a class="dropdown-item" href="/pesquisa">Pesquisar</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/relatorio-sentenciados">Relatórios</a></li>
+                        <li><a class="dropdown-item" href="#">Relatórios</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -46,6 +44,17 @@
                         <li><a class="dropdown-item" href="#">Relatórios</a></li>
                     </ul>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="visitasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-badge-fill"></i> FUNCIONARIOS
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="visitasDropdown">
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                    </ul>
+                </li>
             </ul>       
             <ul>
                 <a href="/"><img src="{{ url_for('static', filename='img/penla.png') }}" class="rounded" alt="Logo"></a>
@@ -57,12 +66,12 @@
     <div class="card totals-card bg-main-card" style="display: inline-block; width: 100%; border: 0cap; position: relative; margin-top: 10px;">
         <div class="row">
             <!-- Coluna 1 - Alojamentos -->
-            <div class="col-md-4">
+            <div class="col-md-4 shadow-lg rounded-3">
                 <!-- Card Alojamentos -->
                 <div class="card">
                     <div class="card-body">
                         <div class="card-header bg-secondary text-white">
-                            <h5 class="card-title mb-0">ALOJAMENTOS<i class="bi bi-buildings-fill"></i></h5>
+                            <h5 class="card-title mb-0">ALOJAMENTOS </h5>
                         </div>
 
                         <!-- Alojamento 1 -->
@@ -161,12 +170,12 @@
             </div>
 
             <!-- Coluna 2 - Presos Trabalhando e Visitas -->
-            <div class="col-md-8">
+            <div class="col-md-8 shadow-lg rounded-3">
                 <!-- Presos Trabalhando -->
                 <div class="card mb-4">
                     <div class="card-body">    
                         <div class="card-header bg-secondary text-white">
-                            <h5 class="card-title mb-0">Presos que Trabalham (Não significa que estão Trabalhando hoje!)<i class="bi bi-calculator"></i></h5>
+                            <h5 class="card-title mb-0">Presos que Trabalham (Não significa que estão Trabalhando hoje!)</h5>
                         </div>
                         <div class="table-overflow">
                             {{ tab_trabalho|safe }}
@@ -181,10 +190,10 @@
                 </div>
 
                 <!-- Card Visitas -->
-                <div class="card">
+                <div class="card mb-4 shadow-lg rounded-3">
                     <div class="card-body">
                         <div class="card-header bg-secondary text-white">
-                            <h5 class="card-title mb-0">Visitantes<i class="bi bi-calculator"></i></h5>
+                            <h5 class="card-title mb-0">Visitantes</h5>
                         </div>
                         <div class="row">
                             <div class="col">
@@ -254,18 +263,27 @@
 <footer class="py-3 my-4">
     <ul class="nav justify-content-center border-bottom pb-3 mb-3">
         <li class="nav-item">
-            <a href="/admin" class="nav-link px-2 text-muted">Admin Page</a>
+            <a href="#" class="nav-link px-2 text-muted" onclick="return promptPassword()">Administração</a>
+            <script>
+                function promptPassword() {
+                    var password = prompt("Por favor, digite a senha de acesso:");
+                    if (password === atob("MDIwMjMwOTE=")) {
+                        window.location.href = "/debug";
+                        return false;
+                    } else {
+                        alert("Senha inválida. Tente novamente.");
+                        return false;
+                    }
+                }
+            </script>
         </li>
         <li>
             <a href="" class="nav-link px-2 text-muted">Outros Links</a>
         </li>
     </ul>
-    <p class="text-center text-body-secondary">&copy; 2025 Fernando Pereira | Versão: 0.7 Flask</p>
+    <p class="text-center text-body-secondary">&copy; 2025 Fernando Pereira | Versão: 0.78 Flask</p>
 </footer>
 <!-- Final Footer -->
-
-<!-- Scripts necessários para Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <!-- Script para forçar funcionamento do dropdown -->
 <script>

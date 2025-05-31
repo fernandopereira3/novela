@@ -273,3 +273,170 @@ def test_debug():
         'debug.html',
         debug_content='<div class="alert alert-success">Teste funcionando!</div>',
     )
+
+@app.route('/normalizar_banco', methods=['GET', 'POST'])
+def normalizar_banco():
+    """Rota simplificada para normalizar todos os nomes do banco de dados em maiúsculas"""
+    
+    if request.method == 'GET':
+        # Retornar página simples de confirmação
+        return render_template('debug.html', debug_content='''
+            <div class="alert alert-warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> Normalizar Banco de Dados</h4>
+                <p>Esta ação irá converter todos os nomes para MAIÚSCULAS.</p>
+                <form method="POST">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-check"></i> Confirmar Normalização
+                    </button>
+                    <a href="/debug" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        ''')
+    
+    try:
+        total_atualizados = 0
+        erros = []
+        
+        # 1. NORMALIZAR SENTENCIADOS
+        print("Normalizando sentenciados...")
+        for doc in db.sentenciados.find():
+            try:
+                updates = {}
+                
+                # Nome
+                if 'nome' in doc and doc['nome']:
+                    nome_novo = doc['nome'].upper().strip()
+                    if doc['nome'] != nome_novo:
+                        updates['nome'] = nome_novo
+                
+                # Outros campos texto
+                for campo in ['procedencia', 'artigo', 'observacoes']:
+                    if campo in doc and doc[campo] and isinstance(doc[campo], str):
+                        valor_novo = doc[campo].upper().strip()
+                        if doc[campo] != valor_novo:
+                            updates[campo] = valor_novo
+                
+                if updates:
+                    db.sentenciados.update_one({'_id': doc['_id']}, {'$set': updates})
+                    total_atualizados += 1
+                    
+            except Exception as e:
+                erros.append(f"Sentenciado {doc.get('matricula', 'N/A')}: {str(e)}")
+        
+        # 2. NORMALIZAR VISITAS
+        print("Normalizando visitas...")
+        if 'visita' in db.list_collection_names():
+            for doc in db.visita.find():
+                try:
+                    updates = {}
+                    
+                    for campo in ['nome', 'visitante', 'parentesco']:
+                        if campo in doc and doc[campo]:
+                            valor_novo = doc[campo].upper().strip()
+                            if doc[campo] != valor_novo:
+                                updates[campo] = valor_novo
+                    
+                    if updates:
+                        db.visita.update_one({'_id': doc['_id']}, {'$set': updates})
+                        total_atualizados += 1
+                        
+                except Exception as e:
+                    erros.append(f"Visita {doc.get('matricula', 'N/A')}: {str(e)}")
+        
+        # 3. NORMALIZAR TRABALHO
+        print("Normalizando trabalho...")
+        if 'trab' in db.list_collection_names():
+            for doc in db.trab.find():
+                try:
+                    updates = {}
+                    
+                    for campo in ['nome', 'setor', 'funcao']:
+                        if campo in doc and doc[campo] and isinstance(doc[campo], str):
+                            valor_novo = doc[campo].upper().strip()
+                            if doc[campo] != valor_novo:
+                                updates[campo] = valor_novo
+                    
+                    if updates:
+                        db.trab.update_one({'_id': doc['_id']}, {'$set': updates})
+                        total_atualizados += 1
+                        
+                except Exception as e:
+                    erros.append(f"Trabalho {doc.get('matricula', 'N/A')}: {str(e)}")
+        
+        # RESULTADO SIMPLES
+        resultado_html = f'''
+        <div class="alert alert-success">
+            <h4><i class="fas fa-check-circle"></i> Normalização Concluída!</h4>
+            <p><strong>Total de registros atualizados:</strong> {total_atualizados}</p>
+            {f'<p><strong>Erros encontrados:</strong> {len(erros)}</p>' if erros else ''}
+        </div>
+        
+        {f'''
+        <div class="alert alert-warning">
+            <h5>Erros:</h5>
+            <ul>
+                {''.join([f'<li>{erro}</li>' for erro in erros[:10]])}
+                {f'<li>... e mais {len(erros) - 10} erros</li>' if len(erros) > 10 else ''}
+            </ul>
+        </div>
+        ''' if erros else ''}
+        
+        <div class="mt-3">
+            <a href="/debug" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Voltar ao Debug
+            </a>
+            <a href="/" class="btn btn-success">
+                <i class="fas fa-home"></i> Página Inicial
+            </a>
+        </div>
+        '''
+        
+        return render_template('debug.html', debug_content=resultado_html)
+        
+    except Exception as e:
+        erro_html = f'''
+        <div class="alert alert-danger">
+            <h4><i class="fas fa-exclamation-circle"></i> Erro na Normalização</h4>
+            <p><strong>Erro:</strong> {str(e)}</p>
+            <div class="mt-3">
+                <a href="/debug" class="btn btn-primary">Voltar ao Debug</a>
+            </div>
+        </div>
+        '''
+        return render_template('debug.html', debug_content=erro_html)
+
+
+@app.route('/api/normalizar_preview', methods=['GET'])
+def preview_normalizacao():
+    """Preview simplificado da normalização"""
+    try:
+        contadores = {'sentenciados': 0, 'visitas': 0, 'trabalho': 0}
+        
+        # Contar sentenciados que precisam normalização
+        for doc in db.sentenciados.find().limit(100):
+            if 'nome' in doc and doc['nome'] and doc['nome'] != doc['nome'].upper().strip():
+                contadores['sentenciados'] += 1
+        
+        # Contar visitas que precisam normalização
+        if 'visita' in db.list_collection_names():
+            for doc in db.visita.find().limit(100):
+                for campo in ['nome', 'visitante', 'parentesco']:
+                    if campo in doc and doc[campo] and doc[campo] != doc[campo].upper().strip():
+                        contadores['visitas'] += 1
+                        break
+        
+        # Contar trabalho que precisa normalização
+        if 'trab' in db.list_collection_names():
+            for doc in db.trab.find().limit(100):
+                for campo in ['nome', 'setor']:
+                    if campo in doc and doc[campo] and isinstance(doc[campo], str) and doc[campo] != doc[campo].upper().strip():
+                        contadores['trabalho'] += 1
+                        break
+        
+        return jsonify({
+            'status': 'success',
+            'preview': contadores
+        })
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
