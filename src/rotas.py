@@ -35,9 +35,8 @@ df_lista_sentenciados = pd.DataFrame(
 )
 ## app.secret_key = ''
 
-
 @app.route('/pesquisa', methods=['GET', 'POST'])
-def pesquisa_matricula():
+def pesquisa():
     form = PesquisaForm()
     sentenciados = db.sentenciados
     resultados = []
@@ -60,6 +59,54 @@ def pesquisa_matricula():
             resultado['_id'] = str(resultado['_id'])
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
+
+@app.route('/sentenciado_detalhes/<id>', methods=['GET'])
+def sentenciado_detalhes(id):
+    try:
+        from bson import json_util, ObjectId
+        from flask import jsonify, JsonResponse
+        sentenciados = db.sentenciados
+        if not ObjectId.is_valid(id):
+            return JsonResponse({"erro": "ID inválido"}, status=400)
+        
+        sentenciado = sentenciados.find_one({"_id": ObjectId(id)})
+
+        if not sentenciado:
+            return JsonResponse({"erro": "Sentenciado não encontrado"}, status=404)
+
+        sentenciado["_id"] = str(sentenciado["_id"])
+        return JsonResponse(json.loads(json_util.dumps(sentenciado)), safe=False)
+
+    except Exception as e:
+        return JsonResponse({"erro": str(e)}, status=500)
+
+
+
+
+@app.route('/entrada_saida', methods=['GET', 'POST'])
+def entrada_saida():
+    form = PesquisaForm()
+    sentenciados = db.sentenciados
+    resultados = []
+
+    if form.validate_on_submit():
+        matricula = form.matricula.data.strip()
+        nome = form.nome.data.strip()
+        query = {}
+
+        if matricula:
+            query['matricula'] = {
+                '$regex': f'^\\s*{re.escape(matricula)}\\s*$',
+                '$options': 'i',
+            }
+        if nome:
+            query['nome'] = {'$regex': nome, '$options': 'i'}
+
+        resultados = list(sentenciados.find(query))
+        for resultado in resultados:
+            resultado['_id'] = str(resultado['_id'])
+
+    return render_template('entrada_saida.html', form=form, sentenciados=resultados)
 
 
 @app.route('/download', methods=['GET'])
@@ -288,7 +335,7 @@ def limpar_lista():
     global df_lista_sentenciados
     df_lista_sentenciados = pd.DataFrame(columns=df_lista_sentenciados.columns)
     flash('Lista limpa com sucesso!', 'success')
-    return redirect(url_for('pesquisa_matricula'))
+    return redirect(url_for('entrada_saida'))
 
 
 @app.route('/clear', methods=['GET'])

@@ -58,7 +58,9 @@ def jumbo():
                     {'matricula': matricula}
                 )
                 if sentenciado:
-                    form.nome.data = sentenciado.get('nome')
+                    # Normalizar nome do sentenciado em maiúsculas
+                    nome_normalizado = sentenciado.get('nome', '').upper().strip()
+                    form.nome.data = nome_normalizado
                     form.matricula.data = sentenciado.get('matricula')
 
             elif 'adicionar' in request.form:
@@ -71,15 +73,20 @@ def jumbo():
                     flash('Todos os campos devem ser preenchidos', 'error')
                     return redirect(url_for('jumbo'))
 
+                # NORMALIZAÇÃO DOS NOMES EM MAIÚSCULAS
+                nome_normalizado = nome.upper().strip()
+                visitante_normalizado = visitante.upper().strip()
+                parentesco_normalizado = parentesco.upper().strip()
+
                 existing_mongo = db.visita.find_one(
-                    {'matricula': matricula, 'visitante': visitante}
+                    {'matricula': matricula, 'visitante': visitante_normalizado}
                 )
 
                 nova_visita = {
                     'matricula': matricula,
-                    'nome': nome,
-                    'visitante': visitante,
-                    'parentesco': parentesco,
+                    'nome': nome_normalizado,  # Nome normalizado
+                    'visitante': visitante_normalizado,  # Visitante normalizado
+                    'parentesco': parentesco_normalizado,  # Parentesco normalizado
                     'data_visita': pd.Timestamp.now(),
                 }
 
@@ -135,9 +142,9 @@ def download_visitas_pdf():
             table_data.append(
                 [
                     row['matricula'],
-                    row['nome'],
-                    row['visitante'],
-                    row['parentesco'],
+                    row['nome'],  # Já estará em maiúsculas
+                    row['visitante'],  # Já estará em maiúsculas
+                    row['parentesco'],  # Já estará em maiúsculas
                 ]
             )
 
