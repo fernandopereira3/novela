@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -14,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
 <body>
-   <!---HEADER SIMPLIFICADO E FUNCIONAL-->
+    <!---HEADER SIMPLIFICADO E FUNCIONAL-->
     <nav class="navbar navbar-expand-lg navbar-light bg-nav">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
@@ -46,10 +45,10 @@
                 </p>
             </form>
         </div>
-         <div class="col">
+          <div class="col">
             {% if sentenciados %}
             <table class="table table-overflow" style="width: 96%;">
-                 <style>
+                  <style>
                     .table-overflow {
                         max-height: 30px;
                         overflow-y: auto;
@@ -109,18 +108,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Função para carregar os detalhes do sentenciado via AJAX
-    function carregarDetalhes(id) {
-    console.log('Iniciando carregamento para ID:', id); // Debug inicial
+    function carregarDetalhes(matricula) {
+    console.log('Iniciando carregamento para matricula:', matricula);
     
     // Mostrar a modal
     var myModal = new bootstrap.Modal(document.getElementById('detalhesSentenciadoModal'));
     myModal.show();
     
     // Fazer a requisição AJAX para obter os detalhes
-    fetch(`/sentenciado_detalhes/${id}`)
+    fetch(`/sentenciado_detalhes/${matricula}`)
         .then(response => {
-            console.log('Status da resposta:', response.status); // Debug status
-            console.log('Response OK:', response.ok); // Debug se OK
+            console.log('Status da resposta:', response.status);
+            console.log('Response OK:', response.ok);
             
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status} - ${response.statusText}`);
@@ -128,35 +127,30 @@
             return response.json();
         })
         .then(data => {
-            console.log('Dados recebidos completos:', data); // Debug completo
-            console.log('Tipo dos dados:', typeof data); // Debug tipo
-            console.log('Dados são array?', Array.isArray(data)); // Debug se é array
+            console.log('Dados recebidos completos:', data);
+            console.log('Tipo dos dados:', typeof data);
             
-            // Verificação mais flexível
-            if (data === null || data === undefined) {
-                throw new Error('Nenhum dado recebido do servidor');
+            // Verificação mais robusta
+            if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
+                throw new Error('Nenhum dado válido recebido do servidor');
             }
             
-            // Se for array, pegar o primeiro elemento
-            const sentenciado = Array.isArray(data) ? data[0] : data;
-            
-            if (!sentenciado) {
-                throw new Error('Dados do sentenciado não encontrados');
+            // Se há erro na resposta
+            if (data.erro) {
+                throw new Error(data.erro);
             }
             
             // Preencher a modal com os detalhes
-            const conteudo = criarConteudoDetalhes(sentenciado);
-            console.log('Conteúdo gerado:', conteudo); // Debug do conteúdo gerado
+            const conteudo = criarConteudoDetalhes(data);
             document.getElementById('detalhesSentenciadoConteudo').innerHTML = conteudo;
         })
         .catch(error => {
-            console.error('Erro completo:', error); // Debug do erro
-            console.error('Stack trace:', error.stack); // Debug stack trace
+            console.error('Erro completo:', error);
             document.getElementById('detalhesSentenciadoConteudo').innerHTML = 
                 `<div class="alert alert-danger">
                     <h5>Erro ao carregar detalhes:</h5>
                     <p>${error.message}</p>
-                    <small>ID solicitado: ${id}</small>
+                    <small>Matrícula solicitada: ${matricula}</small>
                 </div>`;
         });
 }

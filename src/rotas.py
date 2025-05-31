@@ -60,26 +60,34 @@ def pesquisa():
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
 
-@app.route('/sentenciado_detalhes/<id>', methods=['GET'])
-def sentenciado_detalhes(id):
+@app.route('/sentenciado_detalhes/<matricula>', methods=['GET'])
+def sentenciado_detalhes(matricula):
     try:
-        from bson import json_util, ObjectId
-        from flask import jsonify, JsonResponse
-        sentenciados = db.sentenciados
-        if not ObjectId.is_valid(id):
-            return JsonResponse({"erro": "ID inválido"}, status=400)
+        from bson import json_util
+        import json
         
-        sentenciado = sentenciados.find_one({"_id": ObjectId(id)})
-
+        # CORREÇÃO: usar db.sentenciados diretamente
+        sentenciados_collection = db.sentenciados
+        
+        # Buscar o sentenciado
+        sentenciado = sentenciados_collection.find_one({"matricula": matricula})
+        
         if not sentenciado:
-            return JsonResponse({"erro": "Sentenciado não encontrado"}, status=404)
-
-        sentenciado["_id"] = str(sentenciado["_id"])
-        return JsonResponse(json.loads(json_util.dumps(sentenciado)), safe=False)
-
+            return jsonify({"erro": "Sentenciado não encontrado"}), 404
+        
+        # Converter ObjectId para string se existir
+        if '_id' in sentenciado:
+            sentenciado['_id'] = str(sentenciado['_id'])
+        
+        # Garantir que matricula seja string
+        sentenciado["matricula"] = str(sentenciado["matricula"])
+        
+        # Retornar dados usando json_util para lidar com tipos MongoDB
+        return json_util.dumps(sentenciado), 200, {'Content-Type': 'application/json'}
+        
     except Exception as e:
-        return JsonResponse({"erro": str(e)}, status=500)
-
+        print(f"Erro na rota sentenciado_detalhes: {str(e)}")  # Debug
+        return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
 
 
 
