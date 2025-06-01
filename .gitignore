@@ -137,3 +137,4 @@ dmypy.json
 *lib64*
 *cript*
 *cripts*
+.DS_Store
