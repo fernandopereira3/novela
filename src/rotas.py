@@ -63,10 +63,7 @@ def pesquisa():
 @app.route('/sentenciado_detalhes/<matricula>', methods=['GET'])
 def sentenciado_detalhes(matricula):
     try:
-        from bson import json_util
-        import json
         
-        # CORREÇÃO: usar db.sentenciados diretamente
         sentenciados_collection = db.sentenciados
         
         # Buscar o sentenciado
