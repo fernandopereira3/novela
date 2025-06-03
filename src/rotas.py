@@ -306,9 +306,17 @@ def visualizar_lista():
         }
     except Exception as e:
         print(f'Error: {str(e)}')
-        totals = {'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
+        entrada = {'matriculas': 0, 'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
 
-    tabela_entrada = df_lista_sentenciados.to_html(
+    # Tratar valores None/NaN antes de converter para HTML
+    df_clean = df_lista_sentenciados.copy()
+    df_clean = df_clean.fillna(0)  # Substituir NaN por 0
+    df_clean['garrafas'] = df_clean['garrafas'].replace('', 0)
+    df_clean['homens'] = df_clean['homens'].replace('', 0)
+    df_clean['mulheres'] = df_clean['mulheres'].replace('', 0)
+    df_clean['criancas'] = df_clean['criancas'].replace('', 0)
+
+    tabela_entrada = df_clean.to_html(
         index=False, classes='table table-bordered'
     )
 
@@ -400,6 +408,54 @@ def salvar_lista_no_banco():
 
     except Exception as e:
         return jsonify({f'Erro ao salvar no banco de dados: {str(e)}'})
+
+
+@app.route('/editar_visitantes/<matricula>', methods=['PUT'])
+def editar_visitantes(matricula):
+    global df_lista_sentenciados
+    
+    try:
+        data = request.get_json()
+        garrafas = data.get('garrafas', 0)
+        homens = data.get('homens', 0)
+        mulheres = data.get('mulheres', 0)
+        criancas = data.get('criancas', 0)
+        
+        # Verificar se todos os valores são zero
+        if garrafas == 0 and homens == 0 and mulheres == 0 and criancas == 0:
+            # Remover a linha completamente
+            df_lista_sentenciados = df_lista_sentenciados[
+                df_lista_sentenciados['matricula'] != matricula
+            ]
+            return jsonify({
+                'status': 'success', 
+                'message': 'Registro removido (todos os visitantes foram zerados)'
+            })
+        
+        # Atualizar os valores na linha existente
+        mask = df_lista_sentenciados['matricula'] == matricula
+        if mask.any():
+            df_lista_sentenciados.loc[mask, 'garrafas'] = garrafas
+            df_lista_sentenciados.loc[mask, 'homens'] = homens
+            df_lista_sentenciados.loc[mask, 'mulheres'] = mulheres
+            df_lista_sentenciados.loc[mask, 'criancas'] = criancas
+            df_lista_sentenciados.loc[mask, 'data_adicao'] = datetime.datetime.now().strftime('%d/%m/%Y as %H:%M')
+            
+            return jsonify({
+                'status': 'success', 
+                'message': 'Visitantes atualizados com sucesso'
+            })
+        else:
+            return jsonify({
+                'status': 'error', 
+                'message': 'Matrícula não encontrada'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'status': 'error', 
+            'message': f'Erro ao editar visitantes: {str(e)}'
+        })
 
 
 ## LOGIN ##

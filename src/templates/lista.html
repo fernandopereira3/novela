@@ -46,9 +46,10 @@
         </div>
     </nav>
     <div><p></div>
+    
     <div class="container shadow-lg" style="border: 1px solid black;">
         <h1 class="mt-4 mb-4">ENTRADA / SAÍDA DE VISITANTES</h1>
-        
+        <!-- Mensagens de alerta -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -127,6 +128,8 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         // Função para confirmar limpeza da lista
         function confirmClear(event) {
@@ -151,10 +154,132 @@
             return false;
         }
         
-        // Código para manipulação da tabela
+        // Definir as funções FORA do DOMContentLoaded para ficarem globais
+        function editarVisitantes(matricula, garrafas, homens, mulheres, criancas) {
+            console.log('Função editarVisitantes chamada com:', {matricula, garrafas, homens, mulheres, criancas});
+            
+            // Verificar se Bootstrap existe
+            if (typeof bootstrap === 'undefined') {
+                alert('Bootstrap não carregado!');
+                return;
+            }
+            
+            // Remover modal existente
+            const existingModal = document.getElementById('editModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Criar modal mais simples
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = `
+                <div class="modal fade" id="editModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Editar Visitantes - ${matricula}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">PET:</label>
+                                    <input type="number" id="edit-garrafas" value="${garrafas}" min="0" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Homens:</label>
+                                    <input type="number" id="edit-homens" value="${homens}" min="0" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mulheres:</label>
+                                    <input type="number" id="edit-mulheres" value="${mulheres}" min="0" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Crianças:</label>
+                                    <input type="number" id="edit-criancas" value="${criancas}" min="0" class="form-control">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="salvarEdicaoSimples('${matricula}')">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalDiv.firstElementChild);
+            
+            // Tentar abrir o modal
+            try {
+                const modalElement = document.getElementById('editModal');
+                console.log('Modal element:', modalElement);
+                
+                const modal = new bootstrap.Modal(modalElement);
+                console.log('Modal instance:', modal);
+                
+                modal.show();
+                console.log('Modal.show() chamado');
+                
+            } catch (error) {
+                console.error('Erro ao abrir modal:', error);
+                alert('Erro ao abrir modal: ' + error.message);
+            }
+        }
+
+        function salvarEdicaoSimples(matricula) {
+            const garrafas = document.getElementById('edit-garrafas').value;
+            const homens = document.getElementById('edit-homens').value;
+            const mulheres = document.getElementById('edit-mulheres').value;
+            const criancas = document.getElementById('edit-criancas').value;
+            
+            console.log('Salvando:', {matricula, garrafas, homens, mulheres, criancas});
+            
+            fetch(`/editar_visitantes/${matricula}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    garrafas: parseInt(garrafas),
+                    homens: parseInt(homens),
+                    mulheres: parseInt(mulheres),
+                    criancas: parseInt(criancas)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Resposta:', data);
+                
+                // Fechar modal
+                const modalElement = document.getElementById('editModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+                
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Erro ao salvar');
+            });
+        }
+
+        // Agora o DOMContentLoaded
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado');
+            console.log('Bootstrap disponível:', typeof bootstrap !== 'undefined');
+            
             const tabela = document.querySelector('#tabela-wrapper table');
-            if (!tabela) return;
+            if (!tabela) {
+                console.log('Tabela não encontrada');
+                return;
+            }
             
             // Adicionar classe para estilização
             tabela.classList.add('table', 'table-bordered');
@@ -215,42 +340,55 @@
             
             // Adicionar botões de remoção a cada linha
             const rows = tabela.querySelectorAll('tbody tr');
-            rows.forEach(row => {
+            rows.forEach((row, rowIndex) => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > 0) {
                     const matricula = cells[0].textContent.trim();
+                    console.log(`Processando linha ${rowIndex}, matrícula: ${matricula}`);
                     
-                    // Verificar se já existe uma célula de ação
+                    // Verificar se já existe célula de ação
                     let actionCell = row.querySelector('td:last-child button.btn-danger');
                     if (!actionCell) {
                         // Criar célula de ação
                         actionCell = document.createElement('td');
                         
-                        // Criar botão de remoção
+                        // Botão de edição
+                        const editBtn = document.createElement('button');
+                        editBtn.className = 'btn btn-sm btn-warning me-1';
+                        editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+                        editBtn.onclick = function() {
+                            console.log('Botão editar clicado para matrícula:', matricula);
+                            
+                            // Capturar valores das células
+                            const garrafas = cells[3] ? cells[3].textContent.trim() : '0';
+                            const homens = cells[4] ? cells[4].textContent.trim() : '0';
+                            const mulheres = cells[5] ? cells[5].textContent.trim() : '0';
+                            const criancas = cells[6] ? cells[6].textContent.trim() : '0';
+                            
+                            console.log('Valores capturados:', {garrafas, homens, mulheres, criancas});
+                            
+                            editarVisitantes(matricula, garrafas, homens, mulheres, criancas);
+                        };
+                        
+                        // Botão de remoção (mantém o existente)
                         const deleteBtn = document.createElement('button');
                         deleteBtn.className = 'btn btn-sm btn-danger';
-                        deleteBtn.innerHTML = '<i class="bi bi-trash">remover</i>';
+                        deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
                         deleteBtn.onclick = function() {
-                            if (confirm('Tem certeza que deseja remover este item?')) {
-                                fetch(`/remover/${matricula}`, {
-                                    method: 'DELETE'
-                                })
+                            if (confirm('Remover completamente?')) {
+                                fetch(`/remover/${matricula}`, {method: 'DELETE'})
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.status === 'success') {
-                                        row.remove();
                                         location.reload();
                                     } else {
-                                        alert('Erro ao remover item: ' + data.message);
+                                        alert('Erro: ' + data.message);
                                     }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('Erro ao remover item.');
                                 });
                             }
                         };
                         
+                        actionCell.appendChild(editBtn);
                         actionCell.appendChild(deleteBtn);
                         row.appendChild(actionCell);
                     }
@@ -308,8 +446,8 @@
                 rows.forEach(row => tbody.appendChild(row));
             }
             
-            // Ordenar inicialmente por nome (assumindo que é a coluna 1)
-            const colunaDeNome = 1; // Índice da coluna de nome
+            // Ordenar por nome
+            const colunaDeNome = 1; 
             sortTable(colunaDeNome);
         });
     </script>
@@ -338,5 +476,40 @@
     <p class="text-center text-body-secondary">&copy; 2025 Fernando Pereira | Versão: 0.78 Flask</p>
 </footer>
 <!-- Final Footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Adicione esta função de teste
+    function testarModal() {
+        if (typeof bootstrap === 'undefined') {
+            alert('Bootstrap não está carregado!');
+            return;
+        }
+        
+        const modalHtml = `
+            <div class="modal fade" id="testModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Teste</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Modal funcionando!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        setTimeout(() => {
+            const modal = new bootstrap.Modal(document.getElementById('testModal'));
+            modal.show();
+        }, 100);
+    }
+
+    // Chame testarModal() no console do navegador para verificar
+</script>
 </body>
 </html>
