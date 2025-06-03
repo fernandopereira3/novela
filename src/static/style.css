@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Futura:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
 *{ 
-   font-family: Rawline, sans-serif;
-   font-size: 18px;
+   font-family: 'Montserrat', 'Futura';
+   font-size: 16px;
    margin: 0; 
    box-sizing: border-box;
 }
@@ -20,11 +22,11 @@ body {
 }
 
 .bg-main-card{
-   background-color: #ffffff;
+   background-color: #ebebeb;
 }
 
 .btn-primary{
-   background-color: #333333;
+   background-color: #808080;
    color: #fff;
    border: none;
 }
@@ -53,11 +55,16 @@ body {
 }
 
 .bg-card{
-   background-color: #f2f2f2;
+   background-color: #a7a5a5;
    color: #fff;
    border: 1px solid #f2f2f2;
 }
 
+.card-header{
+   background-color: #a7a5a5;
+   color: #fff;
+   border: 1px solid #f2f2f2;
+}
 
 .navbar-nav{
    position: absolute; 
@@ -76,6 +83,7 @@ body {
 
 /* CORREÇÃO ESPECÍFICA PARA DROPDOWN */
 .navbar .dropdown-menu {
+   font-size: 20px;
    position: absolute !important;
    display: none !important;
    z-index: 1000;
@@ -88,6 +96,7 @@ body {
 .navbar .dropdown:hover .dropdown-menu {
    display: block !important;
 }
+
 
                                                             /* FORMS */
 
@@ -135,6 +144,7 @@ body {
 .table-bordered td{
    text-align: center;
 }
+
 
 .sort-btn {
    background: none;

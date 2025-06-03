@@ -45,9 +45,9 @@
             </ul> 
         </div>
     </nav>
-    
-    <div class="container">
-        <h1 class="mt-4 mb-4">ENTRADA DE VISITANTES</h1>
+    <div><p></div>
+    <div class="container shadow-lg" style="border: 1px solid black;">
+        <h1 class="mt-4 mb-4">ENTRADA / SAÍDA DE VISITANTES</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -59,7 +59,7 @@
         
         <!-- RESUMO -->
         <div class="card totals-card justify-content-center">
-            <div class="card-header bg-card text-body-secondary">
+            <div class="card-header bg-card">
                 <h5 class="card-title mb-0">Resumo</h5>
             </div>
             
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        
+        <div><hr></div>
         <!-- LISTA -->
         <div class="table">
             {% if tabela_entrada %}
