@@ -35,9 +35,10 @@
                         </a>
                     </form>
                 </li>
-            </ul>            <ul>
-                <a href="/"><img src="../static/img/penla.png" class="rounded" alt="Logo"></a>
-            </ul> 
+            </ul>            
+             <ul>
+                <a href="/"><img src="{{ url_for('static', filename='img/penpol_logo.png') }}" class="rounded" alt="Logo"></a>
+            </ul>
         </div>
     </nav>
     <!----FIM DO HEADER-->
@@ -136,26 +137,20 @@
 <!-- Footer -->
 <footer class="py-3 my-4">
     <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item">
-            <a href="#" class="nav-link px-2 text-muted" onclick="return promptPassword()">Administração</a>
-            <script>
-                function promptPassword() {
-                    var password = prompt("Por favor, digite a senha de acesso:");
-                    if (password === atob("MDIwMjMwOTE=")) {
-                        window.location.href = "/debug";
-                        return false;
-                    } else {
-                        alert("Senha inválida. Tente novamente.");
-                        return false;
-                    }
-                }
-            </script>
-        </li>
-        <li>
-            <a href="" class="nav-link px-2 text-muted">Outros Links</a>
-        </li>
     </ul>
-    <p class="text-center text-body-secondary">&copy; 2025 Fernando Pereira | Versão: 0.7 Flask</p>
+    <a href="/debug" class="nav-link px-2 text-muted text-center" onclick="return promptPassword()">&copy; 2025 Fernando Pereira | Versão: 0.9 Flask</a>
+    <script>
+        function promptPassword() {
+            var password = prompt("Por favor, digite a senha de acesso:");
+            if (password === atob("MDIwMjMwOTE=")) {
+                window.location.href = "/debug";
+                return false;
+            } else {
+                alert("Senha inválida. Tente novamente.");
+                return false;
+            }
+        }
+    </script>
 </footer>
 <!-- Final Footer -->
 </body>

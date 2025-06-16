@@ -3,8 +3,8 @@ import os
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
+from jumbo import *
 # Importa o módulo de usuários para garantir que as rotas sejam registradas  
-
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
