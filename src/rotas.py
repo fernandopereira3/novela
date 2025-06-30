@@ -1,5 +1,4 @@
 from flask import (
-    Flask,
     render_template,
     jsonify,
     request,
@@ -7,6 +6,7 @@ from flask import (
     redirect,
     url_for,
     send_file,
+    session,
 )
 import pandas as pd
 import re
@@ -19,7 +19,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from main import app, db, PesquisaForm
 from flask import render_template, request, redirect, url_for, session, flash
-from werkzeug.security import check_password_hash
 from debug import *
 
 df_lista_sentenciados = pd.DataFrame(
@@ -34,6 +33,7 @@ df_lista_sentenciados = pd.DataFrame(
     ]
 )
 ## app.secret_key = ''
+
 
 @app.route('/pesquisa', methods=['GET', 'POST'])
 def pesquisa():
@@ -60,32 +60,37 @@ def pesquisa():
 
     return render_template('pesquisa.html', form=form, sentenciados=resultados)
 
+
 @app.route('/sentenciado_detalhes/<matricula>', methods=['GET'])
 def sentenciado_detalhes(matricula):
     try:
-        
         sentenciados_collection = db.sentenciados
-        
+
         # Buscar o sentenciado
-        sentenciado = sentenciados_collection.find_one({"matricula": matricula})
-        
+        sentenciado = sentenciados_collection.find_one(
+            {'matricula': matricula}
+        )
+
         if not sentenciado:
-            return jsonify({"erro": "Sentenciado não encontrado"}), 404
-        
+            return jsonify({'erro': 'Sentenciado não encontrado'}), 404
+
         # Converter ObjectId para string se existir
         if '_id' in sentenciado:
             sentenciado['_id'] = str(sentenciado['_id'])
-        
-        # Garantir que matricula seja string
-        sentenciado["matricula"] = str(sentenciado["matricula"])
-        
-        # Retornar dados usando json_util para lidar com tipos MongoDB
-        return json_util.dumps(sentenciado), 200, {'Content-Type': 'application/json'}
-        
-    except Exception as e:
-        print(f"Erro na rota sentenciado_detalhes: {str(e)}")  # Debug
-        return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
 
+        # Garantir que matricula seja string
+        sentenciado['matricula'] = str(sentenciado['matricula'])
+
+        # Retornar dados usando json_util para lidar com tipos MongoDB
+        return (
+            json_util.dumps(sentenciado),
+            200,
+            {'Content-Type': 'application/json'},
+        )
+
+    except Exception as e:
+        print(f'Erro na rota sentenciado_detalhes: {str(e)}')  # Debug
+        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
 
 
 @app.route('/entrada_saida', methods=['GET', 'POST'])
@@ -111,24 +116,37 @@ def entrada_saida():
         for resultado in resultados:
             resultado['_id'] = str(resultado['_id'])
 
-    return render_template('entrada_saida.html', form=form, sentenciados=resultados)
+    return render_template(
+        'entrada_saida.html', form=form, sentenciados=resultados
+    )
 
 
 @app.route('/download', methods=['GET'])
 def download_pdf():
     # Get data from MongoDB collection instead of global variable
     collection = db['lista_sentenciados']
-    records = list(collection.find({}, {'_id': 0}))  # Exclude MongoDB _id field
-    
+    records = list(
+        collection.find({}, {'_id': 0})
+    )  # Exclude MongoDB _id field
+
     # Convert MongoDB records to DataFrame
     if not records:
         # Return empty DataFrame with expected columns if no records
         df_data = pd.DataFrame(
-            columns=['matricula', 'nome', 'pavilhao', 'garrafas', 'homens', 'mulheres', 'criancas', 'data_adicao']
+            columns=[
+                'matricula',
+                'nome',
+                'pavilhao',
+                'garrafas',
+                'homens',
+                'mulheres',
+                'criancas',
+                'data_adicao',
+            ]
         )
     else:
         df_data = pd.DataFrame(records)
-    
+
     # Sort data if requested
     sort_by = request.args.get('sort', 'nome')
     df_sorted = (
@@ -201,7 +219,7 @@ def download_pdf():
     elements.append(
         Paragraph('<br/><br/><br/>', getSampleStyleSheet()['Normal'])
     )
- 
+
     elements.append(
         Paragraph(
             '<br/><br/><br/>_____________________________<br/>Assinatura do Responsável',
@@ -218,7 +236,6 @@ def download_pdf():
         download_name=f'lista_{datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")}.pdf',
         mimetype='application/pdf',
     )
-
 
 
 @app.route('/adicionar/<matricula>', methods=['POST'])
@@ -306,7 +323,13 @@ def visualizar_lista():
         }
     except Exception as e:
         print(f'Error: {str(e)}')
-        entrada = {'matriculas': 0, 'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
+        entrada = {
+            'matriculas': 0,
+            'garrafas': 0,
+            'homens': 0,
+            'mulheres': 0,
+            'criancas': 0,
+        }
 
     # Tratar valores None/NaN antes de converter para HTML
     df_clean = df_lista_sentenciados.copy()
@@ -413,25 +436,27 @@ def salvar_lista_no_banco():
 @app.route('/editar_visitantes/<matricula>', methods=['PUT'])
 def editar_visitantes(matricula):
     global df_lista_sentenciados
-    
+
     try:
         data = request.get_json()
         garrafas = data.get('garrafas', 0)
         homens = data.get('homens', 0)
         mulheres = data.get('mulheres', 0)
         criancas = data.get('criancas', 0)
-        
+
         # Verificar se todos os valores são zero
         if garrafas == 0 and homens == 0 and mulheres == 0 and criancas == 0:
             # Remover a linha completamente
             df_lista_sentenciados = df_lista_sentenciados[
                 df_lista_sentenciados['matricula'] != matricula
             ]
-            return jsonify({
-                'status': 'success', 
-                'message': 'Registro removido (todos os visitantes foram zerados)'
-            })
-        
+            return jsonify(
+                {
+                    'status': 'success',
+                    'message': 'Registro removido (todos os visitantes foram zerados)',
+                }
+            )
+
         # Atualizar os valores na linha existente
         mask = df_lista_sentenciados['matricula'] == matricula
         if mask.any():
@@ -439,56 +464,36 @@ def editar_visitantes(matricula):
             df_lista_sentenciados.loc[mask, 'homens'] = homens
             df_lista_sentenciados.loc[mask, 'mulheres'] = mulheres
             df_lista_sentenciados.loc[mask, 'criancas'] = criancas
-            df_lista_sentenciados.loc[mask, 'data_adicao'] = datetime.datetime.now().strftime('%d/%m/%Y as %H:%M')
-            
-            return jsonify({
-                'status': 'success', 
-                'message': 'Visitantes atualizados com sucesso'
-            })
+            df_lista_sentenciados.loc[mask, 'data_adicao'] = (
+                datetime.datetime.now().strftime('%d/%m/%Y as %H:%M')
+            )
+
+            return jsonify(
+                {
+                    'status': 'success',
+                    'message': 'Visitantes atualizados com sucesso',
+                }
+            )
         else:
-            return jsonify({
-                'status': 'error', 
-                'message': 'Matrícula não encontrada'
-            })
-            
+            return jsonify(
+                {'status': 'error', 'message': 'Matrícula não encontrada'}
+            )
+
     except Exception as e:
-        return jsonify({
-            'status': 'error', 
-            'message': f'Erro ao editar visitantes: {str(e)}'
-        })
-
-
-## LOGIN ##
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        user = db.usuarios.find_one({'username': username})
-
-        if user and check_password_hash(user['password'], password):
-            session['user'] = username
-            session['role'] = user['role']
-            return redirect(url_for('index'))
-
-        flash('Usuário ou senha inválidos')
-    return render_template('login.html')
-
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
-
-## LOGIN ##
+        return jsonify(
+            {
+                'status': 'error',
+                'message': f'Erro ao editar visitantes: {str(e)}',
+            }
+        )
 
 
 @app.route('/')
 def index():
+    # Verificar se o usuário está logado
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
     # Calculate totals for each pavilion from your data
     totals = {
         'aloj_1a': db.sentenciados.count_documents({'pavilhao': '1A'}),

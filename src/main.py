@@ -3,8 +3,6 @@ import os
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from jumbo import *
-# Importa o módulo de usuários para garantir que as rotas sejam registradas  
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/cpppac'
@@ -31,8 +29,11 @@ class PesquisaForm(FlaskForm):
     pesquisar = SubmitField('PESQUISAR')
 
 
+# Importa os módulos após a criação do app e db para evitar importação circular
 from rotas import *
 from rotas_saida import *
+from jumbo import *
+from user import *
 
 
 if __name__ == '__main__':

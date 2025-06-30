@@ -1,22 +1,18 @@
 from main import app, db, PesquisaForm
 import pandas as pd
 from flask import (
-    Flask,
     render_template,
-    jsonify,
     request,
     flash,
     redirect,
     url_for,
-    send_file,
     make_response,
 )
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from reportlab.lib.units import inch
 from io import BytesIO
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Create DataFrame for daily visits with proper datetime type
 df_visitas = pd.DataFrame(
@@ -59,7 +55,9 @@ def jumbo():
                 )
                 if sentenciado:
                     # Normalizar nome do sentenciado em maiúsculas
-                    nome_normalizado = sentenciado.get('nome', '').upper().strip()
+                    nome_normalizado = (
+                        sentenciado.get('nome', '').upper().strip()
+                    )
                     form.nome.data = nome_normalizado
                     form.matricula.data = sentenciado.get('matricula')
 
@@ -79,7 +77,10 @@ def jumbo():
                 parentesco_normalizado = parentesco.upper().strip()
 
                 existing_mongo = db.visita.find_one(
-                    {'matricula': matricula, 'visitante': visitante_normalizado}
+                    {
+                        'matricula': matricula,
+                        'visitante': visitante_normalizado,
+                    }
                 )
 
                 nova_visita = {
@@ -103,7 +104,7 @@ def jumbo():
                         'Visita registrada com sucesso no histórico permanente',
                         'success',
                     )
-                    
+
             elif 'remover' in request.form:
                 index = int(request.form.get('index'))
                 df_visitas = df_visitas.drop(index).reset_index(drop=True)

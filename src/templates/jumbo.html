@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISUNI - CPPPAC</title>
+    <title>SisUni - CPPPAC</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/sp.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -12,31 +12,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
+
 <body>
-    <!---HEADER-->
+    <!---HEADER SIMPLIFICADO E FUNCIONAL-->
     <nav class="navbar navbar-expand-lg navbar-light bg-nav">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a href="/" class="nav-link"><i class="bi bi-house-fill"></i> INICIO</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/pesquisa" class="nav-link"><i class="bi bi-search"></i> PESQUISAR SENT.</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ url_for('download_visitas_pdf') }}" class="nav-link">
-                        <i class="bi bi-download"></i> DOWNLOAD
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="sentenciadosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-yin-yang"></i> SENTENCIADOS
                     </a>
+                    <ul class="dropdown-menu" aria-labelledby="sentenciadosDropdown">
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><a class="dropdown-item" href="/pesquisa">Pesquisar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item">
-                    <form method="POST" style="display: inline;">
-                        <a href="#" class="nav-link" onclick="return confirm('Tem certeza que deseja limpar toda a lista?')">
-                            <i class="bi bi-trash"></i> LIMPAR LISTA
-                        </a>
-                    </form>
+                    
                 </li>
-            </ul>            
-             <ul>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="visitasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-users"></i> VISITAS
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="visitasDropdown">
+                        <li><a class="dropdown-item" href="/entrada_saida">Entrada/Saida</a></li>
+                        <li><a class="dropdown-item" href="/jumbo">Jumbo</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="visitasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-badge-fill"></i> FUNCIONARIOS
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="visitasDropdown">
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Não Implementado</a></li>
+                    </ul>
+                </li>
+            </ul>       
+            <ul>
                 <a href="/"><img src="{{ url_for('static', filename='img/penpol_logo.png') }}" class="rounded" alt="Logo"></a>
             </ul>
         </div>
