@@ -38,8 +38,7 @@ df_lista_sentenciados = pd.DataFrame(
 @app.route('/pesquisa', methods=['GET', 'POST'])
 def pesquisa():
     form = PesquisaForm()
-    sentenciados = db.sentenciados
-    resultados = []
+    tabela_html = ''  # Tabela vazia inicialmente
 
     if form.validate_on_submit():
         matricula = form.matricula.data.strip()
@@ -48,17 +47,16 @@ def pesquisa():
 
         if matricula:
             query['matricula'] = {
-                '$regex': f'^\\s*{re.escape(matricula)}\\s*$',
+                '$regex': f'^\\s*{re.escape(matricula)}\\s*',
                 '$options': 'i',
             }
         if nome:
             query['nome'] = {'$regex': nome, '$options': 'i'}
 
-        resultados = list(sentenciados.find(query))
-        for resultado in resultados:
-            resultado['_id'] = str(resultado['_id'])
+        # Só gera tabela quando há pesquisa
+        tabela_html = construir_tabela(query=query, incluir_acoes=True)
 
-    return render_template('pesquisa.html', form=form, sentenciados=resultados)
+    return render_template('pesquisa.html', form=form, tabela_html=tabela_html)
 
 
 @app.route('/sentenciado_detalhes/<matricula>', methods=['GET'])
@@ -67,9 +65,7 @@ def sentenciado_detalhes(matricula):
         sentenciados_collection = db.sentenciados
 
         # Buscar o sentenciado
-        sentenciado = sentenciados_collection.find_one(
-            {'matricula': matricula}
-        )
+        sentenciado = sentenciados_collection.find_one({'matricula': matricula})
 
         if not sentenciado:
             return jsonify({'erro': 'Sentenciado não encontrado'}), 404
@@ -97,7 +93,7 @@ def sentenciado_detalhes(matricula):
 def entrada_saida():
     form = PesquisaForm()
     sentenciados = db.sentenciados
-    resultados = []
+    resultados = ""
 
     if form.validate_on_submit():
         matricula = form.matricula.data.strip()
@@ -112,137 +108,19 @@ def entrada_saida():
         if nome:
             query['nome'] = {'$regex': nome, '$options': 'i'}
 
-        resultados = list(sentenciados.find(query))
-        for resultado in resultados:
-            resultado['_id'] = str(resultado['_id'])
+        resultados = construir_tabela(query=query, incluir_acoes=True)
 
     return render_template(
-        'entrada_saida.html', form=form, sentenciados=resultados
+        'entrada_saida.html', form=form, resultados=resultados
     )
 
-
-@app.route('/download', methods=['GET'])
-def download_pdf():
-    # Get data from MongoDB collection instead of global variable
-    collection = db['lista_sentenciados']
-    records = list(
-        collection.find({}, {'_id': 0})
-    )  # Exclude MongoDB _id field
-
-    # Convert MongoDB records to DataFrame
-    if not records:
-        # Return empty DataFrame with expected columns if no records
-        df_data = pd.DataFrame(
-            columns=[
-                'matricula',
-                'nome',
-                'pavilhao',
-                'garrafas',
-                'homens',
-                'mulheres',
-                'criancas',
-                'data_adicao',
-            ]
-        )
-    else:
-        df_data = pd.DataFrame(records)
-
-    # Sort data if requested
-    sort_by = request.args.get('sort', 'nome')
-    df_sorted = (
-        df_data.sort_values(by=sort_by)
-        if sort_by in df_data.columns
-        else df_data
-    )
-
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=letter,
-        leftMargin=15,
-        rightMargin=15,
-        topMargin=20,
-        bottomMargin=20,
-    )
-    elements = []
-
-    try:
-        totals = {
-            'garrafas': df_data['garrafas']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'homens': df_data['homens']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'mulheres': df_data['mulheres']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'criancas': df_data['criancas']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-        }
-    except Exception as e:
-        totals = {'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
-
-    data = [df_sorted.columns.tolist()] + df_sorted.values.tolist()
-    table_nomes = Table(data, colWidths=[70, 180, 35, 35, 35, 35, 90])
-
-    style = TableStyle(
-        [
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 7),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-            ('TOPPADDING', (0, 0), (-1, 0), 8),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('BOX', (0, 0), (-1, -1), 1, colors.black),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('WORDWRAP', (0, 0), (-1, -1), True),
-            ('ALIGN', (2, 1), (-2, -1), 'CENTER'),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ]
-    )
-
-    table_nomes.setStyle(style)
-
-    elements.append(table_nomes)
-    elements.append(
-        Paragraph('<br/><br/><br/>', getSampleStyleSheet()['Normal'])
-    )
-
-    elements.append(
-        Paragraph(
-            '<br/><br/><br/>_____________________________<br/>Assinatura do Responsável',
-            getSampleStyleSheet()['Normal'],
-        )
-    )
-
-    doc.build(elements)
-    buffer.seek(0)
-
-    return send_file(
-        buffer,
-        as_attachment=True,
-        download_name=f'lista_{datetime.datetime.now().strftime("%d-%m-%Y-%H-%M")}.pdf',
-        mimetype='application/pdf',
-    )
-
-
+# ADICIONA VISITA AO BANCO DE DADOS
 @app.route('/adicionar/<matricula>', methods=['POST'])
 def adicionar_lista(matricula):
     global df_lista_sentenciados
 
     sentenciado = db.sentenciados.find_one({'matricula': matricula})
+
     if sentenciado:
         data = request.get_json()
 
@@ -266,22 +144,24 @@ def adicionar_lista(matricula):
         homens = data.get('homens', 0)
         mulheres = data.get('mulheres', 0)
         criancas = data.get('criancas', 0)
-        data_adicao = datetime.datetime.now().strftime('%d/%m/%Y as %H:%M')
 
-        new_row = {
-            'matricula': sentenciado['matricula'],
-            'nome': sentenciado['nome'],
-            'pavilhao': sentenciado['pavilhao'],
-            'garrafas': garrafas,
-            'homens': homens,
-            'mulheres': mulheres,
-            'criancas': criancas,
-            'data_adicao': data_adicao,
-        }
-
-        df_lista_sentenciados = pd.concat(
-            [df_lista_sentenciados, pd.DataFrame([new_row])], ignore_index=True
-        )
+        try:
+            resultado = db.sentenciados.update_one(
+                {'matricula': matricula},
+                {
+                    '$push': {
+                        'visitas': datetime.datetime.now(),
+                    },
+                    '$set': {
+                        'marcadores': [garrafas, homens, mulheres, criancas]
+                    }
+                }
+            )
+          
+            
+        except Exception as e:
+            print(f'Erro ao atualizar documento: {str(e)}')
+            return jsonify({'status': 'error', 'message': f'Erro ao atualizar: {str(e)}'})
 
         # Preparar a resposta
         response = {'status': 'success', 'message': 'Adicionado com sucesso'}
@@ -290,90 +170,124 @@ def adicionar_lista(matricula):
             response['setor'] = setor_trabalho
 
         return jsonify(response)
-    return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+
+    else:
+        print(f"Sentenciado não encontrado para matrícula: {matricula}")
+        return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
 
 
+# LISTA DE VISITAS
 @app.route('/lista', methods=['GET'])
 def visualizar_lista():
-    global df_lista_sentenciados
+    # Definir o início e fim do dia de hoje
+    hoje_inicio = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    hoje_fim = datetime.datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
 
+    resumo = resumo_visitas()
+    
+    # Buscar apenas documentos que têm visitas de hoje E ordenar por nome
+    documentos = list(db.sentenciados.find({
+        'visitas': {
+            '$elemMatch': {
+                '$gte': hoje_inicio,
+                '$lte': hoje_fim
+            }
+        }
+    }, {'_id': 0}).sort('nome', 1))  # 1 = ordem crescente (A-Z)
+    
+    # Processar documentos
+    for doc in documentos:
+        # Filtrar apenas as visitas de hoje
+        visitas_hoje = [v for v in doc.get('visitas', []) if hoje_inicio <= v <= hoje_fim]
+        
+        # Pegar a última visita de hoje
+        if visitas_hoje:
+            doc['data_visita'] = visitas_hoje[-1].strftime('%d/%m/%Y %H:%M')
+        else:
+            doc['data_visita'] = ''
+        
+        # Separar marcadores
+        marcadores = doc.get('marcadores', [0, 0, 0, 0])
+        doc['garrafas'] = marcadores[0] if len(marcadores) > 0 else 0
+        doc['homens'] = marcadores[1] if len(marcadores) > 1 else 0
+        doc['mulheres'] = marcadores[2] if len(marcadores) > 2 else 0
+        doc['criancas'] = marcadores[3] if len(marcadores) > 3 else 0
+
+    return render_template('lista.html', documentos=documentos, resumo=resumo)
+
+# EDITAR LISTA
+@app.route('/editar_marcadores/<matricula>', methods=['PUT'])
+def editar_marcadores(matricula):
     try:
-        entrada = {
-            'matriculas': df_lista_sentenciados['matricula'].count(),
-            'garrafas': df_lista_sentenciados['garrafas']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'homens': df_lista_sentenciados['homens']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'mulheres': df_lista_sentenciados['mulheres']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-            'criancas': df_lista_sentenciados['criancas']
-            .replace('', pd.NA)
-            .fillna(0)
-            .astype(int)
-            .sum(),
-        }
+        data = request.get_json()
+        garrafas = int(data.get('garrafas', 0))
+        homens = int(data.get('homens', 0))
+        mulheres = int(data.get('mulheres', 0))
+        criancas = int(data.get('criancas', 0))
+        
+        # Atualizar os marcadores no banco
+        resultado = db.sentenciados.update_one(
+            {'matricula': matricula},
+            {
+                '$set': {
+                    'marcadores': [garrafas, homens, mulheres, criancas]
+                }
+            }
+        )
+        
+        if resultado.modified_count > 0:
+            return jsonify({
+                'status': 'success', 
+                'message': 'Marcadores atualizados com sucesso',
+                'marcadores': {
+                    'garrafas': garrafas,
+                    'homens': homens,
+                    'mulheres': mulheres,
+                    'criancas': criancas
+                }
+            })
+        else:
+            return jsonify({'status': 'error', 'message': 'Matrícula não encontrada'})
+            
     except Exception as e:
-        print(f'Error: {str(e)}')
-        entrada = {
-            'matriculas': 0,
-            'garrafas': 0,
-            'homens': 0,
-            'mulheres': 0,
-            'criancas': 0,
-        }
-
-    # Tratar valores None/NaN antes de converter para HTML
-    df_clean = df_lista_sentenciados.copy()
-    df_clean = df_clean.fillna(0)  # Substituir NaN por 0
-    df_clean['garrafas'] = df_clean['garrafas'].replace('', 0)
-    df_clean['homens'] = df_clean['homens'].replace('', 0)
-    df_clean['mulheres'] = df_clean['mulheres'].replace('', 0)
-    df_clean['criancas'] = df_clean['criancas'].replace('', 0)
-
-    tabela_entrada = df_clean.to_html(
-        index=False, classes='table table-bordered'
-    )
-
-    return render_template(
-        'lista.html', tabela_entrada=tabela_entrada, entrada=entrada
-    )
+        return jsonify({'status': 'error', 'message': f'Erro ao editar marcadores: {str(e)}'})
 
 
-@app.route('/remover/<matricula>', methods=['DELETE'])
-def remover_lista(matricula):
-    global df_lista_sentenciados
-
-    df_lista_sentenciados = df_lista_sentenciados[
-        df_lista_sentenciados['matricula'] != matricula
-    ]
-
-    if df_lista_sentenciados.empty:
-        return jsonify(
-            {'status': 'error', 'message': 'Matrícula não encontrada'}
+# REMOVER NOME VISITA
+@app.route('/remover_visita_hoje/<matricula>', methods=['DELETE'])
+def remover_visita_hoje(matricula):
+    try:
+        # Definir hoje
+        hoje_inicio = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        hoje_fim = datetime.datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Remover apenas as visitas de hoje
+        resultado = db.sentenciados.update_one(
+            {'matricula': matricula},
+            {
+                '$pull': {
+                    'visitas': {
+                        '$gte': hoje_inicio,
+                        '$lte': hoje_fim
+                    }
+                }
+            }
         )
-    else:
-        return jsonify(
-            {'status': 'success', 'message': 'Matrícula removida com sucesso'}
-        )
+        
+        if resultado.modified_count > 0:
+            return jsonify({'status': 'success', 'message': 'Visita de hoje removida com sucesso'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Nenhuma visita de hoje encontrada para esta matrícula'})
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Erro ao remover visita: {str(e)}'})
 
 
-@app.route('/limpar_lista', methods=['POST'])
-def limpar_lista():
-    global df_lista_sentenciados
-    df_lista_sentenciados = pd.DataFrame(columns=df_lista_sentenciados.columns)
-    flash('Lista limpa com sucesso!', 'success')
-    return redirect(url_for('entrada_saida'))
 
 
+
+
+# LIMPAR MATRICULA COMPLETA SISTEMA DE ADMIN
 @app.route('/clear', methods=['GET'])
 def clean_matricula_complete():
     count = 0
@@ -398,94 +312,276 @@ def clean_matricula_complete():
     return f'LIMPO ! FORAM REMOVIDOS ESPACOS, PONTOS E O DIGITO DE {count} MATRICULAS'
 
 
-@app.route('/salvar-lista', methods=['POST'])
-def salvar_lista_no_banco():
-    global df_lista_sentenciados
 
-    if df_lista_sentenciados.empty:
-        return jsonify({'Nao ha dados para salvar'})
-
-    try:
-        # Criar nome da coleção com timestamp para evitar conflitos
-        collection_name = f'lista_sentenciados'
-        collection = db[collection_name]
-
-        # Limpar dados existentes na coleção
-        collection.delete_many({})
-
-        # Converter DataFrame para lista de dicionários e salvar no MongoDB
-        registros = df_lista_sentenciados.to_dict('records')
-
-        # Inserir registros na coleção
-        result = collection.insert_many(registros)
-
-        # Verificar se inserção foi bem-sucedida
-        if len(result.inserted_ids) == len(registros):
-            return jsonify({f'Lista salva com sucesso'})
-        else:
-            return jsonify(
-                {
-                    f'Alguns registros nao foram salvos. {len(result.inserted_ids)} de {len(registros)} registros salvos.'
-                }
-            )
-
-    except Exception as e:
-        return jsonify({f'Erro ao salvar no banco de dados: {str(e)}'})
-
-
-@app.route('/editar_visitantes/<matricula>', methods=['PUT'])
-def editar_visitantes(matricula):
-    global df_lista_sentenciados
-
-    try:
-        data = request.get_json()
-        garrafas = data.get('garrafas', 0)
-        homens = data.get('homens', 0)
-        mulheres = data.get('mulheres', 0)
-        criancas = data.get('criancas', 0)
-
-        # Verificar se todos os valores são zero
-        if garrafas == 0 and homens == 0 and mulheres == 0 and criancas == 0:
-            # Remover a linha completamente
-            df_lista_sentenciados = df_lista_sentenciados[
-                df_lista_sentenciados['matricula'] != matricula
-            ]
-            return jsonify(
-                {
-                    'status': 'success',
-                    'message': 'Registro removido (todos os visitantes foram zerados)',
-                }
-            )
-
-        # Atualizar os valores na linha existente
-        mask = df_lista_sentenciados['matricula'] == matricula
-        if mask.any():
-            df_lista_sentenciados.loc[mask, 'garrafas'] = garrafas
-            df_lista_sentenciados.loc[mask, 'homens'] = homens
-            df_lista_sentenciados.loc[mask, 'mulheres'] = mulheres
-            df_lista_sentenciados.loc[mask, 'criancas'] = criancas
-            df_lista_sentenciados.loc[mask, 'data_adicao'] = (
-                datetime.datetime.now().strftime('%d/%m/%Y as %H:%M')
-            )
-
-            return jsonify(
-                {
-                    'status': 'success',
-                    'message': 'Visitantes atualizados com sucesso',
-                }
-            )
-        else:
-            return jsonify(
-                {'status': 'error', 'message': 'Matrícula não encontrada'}
-            )
-
-    except Exception as e:
-        return jsonify(
-            {
-                'status': 'error',
-                'message': f'Erro ao editar visitantes: {str(e)}',
+# BAIXA LISTA ROTA DOWNLOADS
+@app.route('/download', methods=['GET'])
+def download_pdf():
+    # Definir o início e fim do dia de hoje
+    hoje_inicio = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    hoje_fim = datetime.datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+    
+    # Buscar apenas documentos que têm visitas de hoje E ordenar por nome
+    documentos = list(db.sentenciados.find({
+        'visitas': {
+            '$elemMatch': {
+                '$gte': hoje_inicio,
+                '$lte': hoje_fim
             }
+        }
+    }, {'_id': 0}).sort('nome', 1))  # 1 = ordem crescente (A-Z)
+    
+    # Processar documentos
+    for doc in documentos:
+        # Filtrar apenas as visitas de hoje
+        visitas_hoje = [v for v in doc.get('visitas', []) if hoje_inicio <= v <= hoje_fim]
+        
+        # Pegar a última visita de hoje
+        if visitas_hoje:
+            doc['data_visita'] = visitas_hoje[-1].strftime('%d/%m/%Y %H:%M')
+        else:
+            doc['data_visita'] = ''
+        
+        # Separar marcadores
+        marcadores = doc.get('marcadores', [0, 0, 0, 0])
+        doc['garrafas'] = marcadores[0] if len(marcadores) > 0 else 0
+        doc['homens'] = marcadores[1] if len(marcadores) > 1 else 0
+        doc['mulheres'] = marcadores[2] if len(marcadores) > 2 else 0
+        doc['criancas'] = marcadores[3] if len(marcadores) > 3 else 0
+
+    # Converter para DataFrame
+    if not documentos:
+        # DataFrame vazio se não houver visitas hoje
+        df_data = pd.DataFrame(
+            columns=[
+                'matricula',
+                'nome',
+                'garrafas',
+                'homens',
+                'mulheres',
+                'criancas',
+                'pavilhao',
+                'data_visita',
+            ]
         )
+    else:
+        df_data = pd.DataFrame(documentos)
+        # Reordenar colunas para o PDF
+        df_data = df_data[['matricula', 'nome', 'garrafas', 'homens', 'mulheres', 'criancas', 'pavilhao', 'data_visita']]
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        leftMargin=15,
+        rightMargin=15,
+        topMargin=20,
+        bottomMargin=20,
+    )
+    elements = []
+
+    # Adicionar título com a data
+    styles = getSampleStyleSheet()
+    titulo = Paragraph(
+        f'<b>Lista de Visitantes - {datetime.datetime.now().strftime("%d/%m/%Y")}</b>',
+        styles['Title']
+    )
+    elements.append(titulo)
+    elements.append(Paragraph('<br/>', styles['Normal']))
+
+    # Calcular totais
+    try:
+        totals = {
+            'garrafas': df_data['garrafas'].fillna(0).astype(int).sum(),
+            'homens': df_data['homens'].fillna(0).astype(int).sum(),
+            'mulheres': df_data['mulheres'].fillna(0).astype(int).sum(),
+            'criancas': df_data['criancas'].fillna(0).astype(int).sum(),
+        }
+        total_visitantes = totals['homens'] + totals['mulheres'] + totals['criancas']
+    except Exception as e:
+        totals = {'garrafas': 0, 'homens': 0, 'mulheres': 0, 'criancas': 0}
+        total_visitantes = 0
+
+    
+    elements.append(Paragraph('<br/>', styles['Normal']))
+
+    # Criar tabela
+    if not df_data.empty:
+        # Cabeçalhos da tabela
+        headers = ['Matrícula', 'Nome', 'Garrafas', 'Homens', 'Mulheres', 'Crianças', 'Pavilhão', 'Hora da Visita']
+        data = [headers] + df_data.values.tolist()
+        
+        # Ajustar larguras das colunas
+        table_nomes = Table(data, colWidths=[60, 140, 40, 40, 40, 40, 50, 70])
+    else:
+        # Tabela vazia se não houver dados
+        data = [['Matrícula', 'Nome', 'Garrafas', 'Homens', 'Mulheres', 'Crianças', 'Pavilhão', 'Hora da Visita'],
+                ['', 'Nenhuma visita registrada hoje', '', '', '', '', '', '']]
+        table_nomes = Table(data, colWidths=[60, 140, 40, 40, 40, 40, 50, 70])
+
+    # Estilo da tabela
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('TOPPADDING', (0, 0), (-1, 0), 8),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('WORDWRAP', (0, 0), (-1, -1), True),
+        ('ALIGN', (2, 1), (-1, -1), 'CENTER'),  # Centralizar números
+        ('ALIGN', (0, 1), (1, -1), 'LEFT'),     # Alinhar matrícula e nome à esquerda
+    ])
+
+    table_nomes.setStyle(style)
+    elements.append(table_nomes)
+    
+    # Espaçamento e assinatura com usuário da sessão
+    elements.append(Paragraph('<br/><br/><br/>', styles['Normal']))
+    
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f'lista_visitas_{datetime.datetime.now().strftime("%d-%m")}.pdf',
+        mimetype='application/pdf',
+    )
+
+def construir_tabela(documentos=None, query=None, incluir_acoes=True, classe_css="table table-striped"):
+    """
+    Função abstrata para construir tabela HTML de sentenciados
+    
+    Args:
+        documentos (list): Lista de documentos já processados (opcional)
+        query (dict): Query MongoDB para buscar documentos (opcional)
+        incluir_acoes (bool): Se deve incluir coluna de ações
+        classe_css (str): Classes CSS para a tabela
+    
+    Returns:
+        str: HTML da tabela ou mensagem de erro
+    """
+    try:
+        # Se não foram passados documentos, buscar no banco
+        if documentos is None:
+            if query is None:
+                # Query padrão - todos os documentos
+                query = {}
+            
+            documentos = list(db.sentenciados.find(query, {'_id': 0}).sort('nome', 1))
+
+        if documentos:
+            # Colunas básicas
+            acoes_header = '<th>Ações</th>' if incluir_acoes else ''
+            
+            html = f"""
+            <table class="{classe_css}" id="tabela-sentenciados">
+                <thead>
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Nome</th>
+                        <th>Alojamento</th>
+                        {acoes_header}
+                    </tr>
+                </thead>
+                <tbody>
+            """
+
+            # Adicionar cada documento como uma linha
+            for doc in documentos:
+                matricula = doc.get('matricula', '')
+                nome = doc.get('nome', '')
+                alojamento = doc.get('pavilhao', '') or doc.get('alojamento', '')
+
+                # Coluna de ações (se solicitada)
+                acoes_cell = ''
+                if incluir_acoes:
+                    acoes_cell = f"""
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="selecionarSentenciado('{matricula}', '{nome}')">
+                                Selecionar
+                            </button>
+                        </td>
+                    """
+
+                linha = f"""
+                    <tr id="row-{matricula}">
+                        <td>{matricula}</td>
+                        <td>{nome}</td>
+                        <td>{alojamento}</td>
+                        {acoes_cell}
+                    </tr>
+                """
+                html += linha
+
+            # Fechar a tabela
+            html += """
+                </tbody>
+            </table>
+            """
+            return html
+        else:
+            return '<p class="alert alert-info">Nenhum resultado encontrado.</p>'
+            
+    except Exception as e:
+        print(f'Erro ao construir tabela: {e}')
+        return f"<p class='alert alert-danger'>Erro ao processar dados: {e}</p>"
+
+def resumo_visitas():
+
+    try:
+        # Definir o início e fim do dia de hoje
+        hoje_inicio = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        hoje_fim = datetime.datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Buscar apenas documentos que têm visitas de hoje
+        documentos_hoje = list(db.sentenciados.find({
+            'visitas': {
+                '$elemMatch': {
+                    '$gte': hoje_inicio,
+                    '$lte': hoje_fim
+                }
+            }
+        }, {'_id': 0}))
+        
+        # Calcular resumo baseado nos dados reais do banco
+        total_matriculas = len(documentos_hoje)
+        total_garrafas = 0
+        total_homens = 0
+        total_mulheres = 0
+        total_criancas = 0
+        
+        for doc in documentos_hoje:
+            marcadores = doc.get('marcadores', [0, 0, 0, 0])
+            total_garrafas += marcadores[0] if len(marcadores) > 0 else 0
+            total_homens += marcadores[1] if len(marcadores) > 1 else 0
+            total_mulheres += marcadores[2] if len(marcadores) > 2 else 0
+            total_criancas += marcadores[3] if len(marcadores) > 3 else 0
+        
+        return {
+            'matriculas': total_matriculas,
+            'garrafas': total_garrafas,
+            'homens': total_homens,
+            'mulheres': total_mulheres,
+            'criancas': total_criancas,
+            'total_visitantes': total_homens + total_mulheres + total_criancas,
+            'data_atual': datetime.datetime.now().strftime('%d/%m/%Y')
+        }
+        
+    except Exception as e:
+        print(f'Erro ao calcular resumo: {str(e)}')
+        return {
+            'matriculas': 0,
+            'garrafas': 0,
+            'homens': 0,
+            'mulheres': 0,
+            'criancas': 0,
+            'total_visitantes': 0,
+            'data_atual': datetime.datetime.now().strftime('%d/%m/%Y')
+        }
 
 
 @app.route('/')
@@ -493,6 +589,8 @@ def index():
     # Verificar se o usuário está logado
     if 'user' not in session:
         return redirect(url_for('login'))
+
+    
 
     # Calculate totals for each pavilion from your data
     totals = {
@@ -507,29 +605,8 @@ def index():
         'total': db.sentenciados.count_documents({}),
     }
 
-    resumo = {
-        'matriculas': df_lista_sentenciados['matricula'].count(),
-        'garrafas': df_lista_sentenciados['garrafas']
-        .replace('', pd.NA)
-        .fillna(0)
-        .astype(int)
-        .sum(),
-        'homens': df_lista_sentenciados['homens']
-        .replace('', pd.NA)
-        .fillna(0)
-        .astype(int)
-        .sum(),
-        'mulheres': df_lista_sentenciados['mulheres']
-        .replace('', pd.NA)
-        .fillna(0)
-        .astype(int)
-        .sum(),
-        'criancas': df_lista_sentenciados['criancas']
-        .replace('', pd.NA)
-        .fillna(0)
-        .astype(int)
-        .sum(),
-    }
+    # Usar a função para obter o resumo
+    resumo = resumo_visitas()
 
     return render_template(
         'index.html', totals=totals, resumo=resumo, trabalho=trabalho

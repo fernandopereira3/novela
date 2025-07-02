@@ -3,8 +3,6 @@ from flask import render_template, redirect, url_for, request, session, flash
 from werkzeug.security import check_password_hash
 
 ## LOGIN ##
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -22,6 +20,4 @@ def login():
         return redirect(url_for('index'))
 
     return render_template('login.html')
-
-
 ## LOGIN ##

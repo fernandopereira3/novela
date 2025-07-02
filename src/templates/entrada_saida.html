@@ -33,7 +33,7 @@
     <p></p>
     <div class="row">
         <div class="col">
-            <form method="POST" class="pesquisa-form shadow-lg rounded-3" style="width: 85%;">
+            <form method="POST" class="form-row" style="width: 80%; margin-left: 100px; border: 1px solid #ccc; padding: 20px; border-radius: 10px;">
                 {{ form.csrf_token }}
                 <div class="d-flex gap-2">
                     <input type="text" class="form-control" id="matricula" placeholder="Matricula" name="matricula" style="width: 20%;">
@@ -71,37 +71,44 @@
             </form>
         </div>
         <div class="col">
-            {% if sentenciados %}
-            <table class="table table-overflow" style="width: 96%; borde">
-                 <style>
-                    .table-overflow {
-                        max-height: 30px;
-                        overflow-y: auto;
+            <div class="table-overflow">
+                    {{ resultados|safe }}
+                    <style>
+                        .table-overflow {
+                            max-height: 300px;
+                            overflow-y: auto;
+                            width: 90%;
+                        }
+                    </style>
+                    <style>
+                        button[onclick*="selecionarSentenciado"] {display: none !important;}
+                    </style>
+                    <script>
+                            // Adiciona botões de detalhes na tabela quando carrega
+                            document.addEventListener('DOMContentLoaded', function() {
+                                adicionarBotoesDetalhes();
+                            });
+                        
+                            function adicionarBotoesDetalhes() {
+                                const tabela = document.getElementById('tabela-sentenciados');
+                                if (!tabela) return;
+                            
+                                tabela.querySelectorAll('tbody tr').forEach(linha => {
+                                    const colunaAcoes = linha.querySelector('td:last-child');
+                                    if (colunaAcoes && !colunaAcoes.querySelector('.btn-info')) {
+                                        const matricula = linha.querySelector('td:first-child').textContent.trim();
+                                    
+                                        const botao = document.createElement('button');
+                                        botao.className = 'btn btn-sm btn-success ms-1';
+                                        botao.innerHTML = 'Adicionar';
+                                        botao.onclick = () => adicionar(matricula);
+                                    
+                                        colunaAcoes.appendChild(botao);
+                                    }
+                                });
                     }
-                </style>
-                <thead>
-                    <tr>
-                        <th scope="col">Matricula</th>
-                        <th scope="col">Nome</th>
-                        <th scope="col">Alojamento</th>
-                        <th scope="col"> </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sentenciado in sentenciados %}
-                    <tr>
-                        <td>{{ sentenciado['matricula'] }}</td>
-                        <td>{{ sentenciado['nome'] }}</td>
-                        <td>{{ sentenciado['pavilhao'] }}</td>
-                        <td>
-                            <button class="btn btn-success" onclick="adicionar('{{ sentenciado.matricula }}')">Adicionar</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            {% endif %}
+                </script>
+            </div>
         </div>
     </div>
     <script>
