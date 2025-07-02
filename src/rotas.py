@@ -530,24 +530,36 @@ def construir_tabela(documentos=None, query=None, incluir_acoes=True, classe_css
         print(f'Erro ao construir tabela: {e}')
         return f"<p class='alert alert-danger'>Erro ao processar dados: {e}</p>"
 
-def resumo_visitas():
 
+def resumo_visitas():
     try:
         # Definir o início e fim do dia de hoje
         hoje_inicio = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         hoje_fim = datetime.datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
         
-        # Buscar apenas documentos que têm visitas de hoje
-        documentos_hoje = list(db.sentenciados.find({
-            'visitas': {
-                '$elemMatch': {
-                    '$gte': hoje_inicio,
-                    '$lte': hoje_fim
+        # Usar agregação do MongoDB para melhor performance
+        pipeline = [
+            {
+                '$match': {
+                    'visitas': {
+                        '$elemMatch': {
+                            '$gte': hoje_inicio,
+                            '$lte': hoje_fim
+                        }
+                    }
+                }
+            },
+            {
+                '$project': {
+                    'matricula': 1,
+                    'marcadores': 1
                 }
             }
-        }, {'_id': 0}))
+        ]
         
-        # Calcular resumo baseado nos dados reais do banco
+        documentos_hoje = list(db.sentenciados.aggregate(pipeline))
+        
+        # Calcular resumo
         total_matriculas = len(documentos_hoje)
         total_garrafas = 0
         total_homens = 0
@@ -556,10 +568,16 @@ def resumo_visitas():
         
         for doc in documentos_hoje:
             marcadores = doc.get('marcadores', [0, 0, 0, 0])
-            total_garrafas += marcadores[0] if len(marcadores) > 0 else 0
-            total_homens += marcadores[1] if len(marcadores) > 1 else 0
-            total_mulheres += marcadores[2] if len(marcadores) > 2 else 0
-            total_criancas += marcadores[3] if len(marcadores) > 3 else 0
+            
+            # Conversão otimizada
+            if marcadores and len(marcadores) >= 4:
+                try:
+                    total_garrafas += int(marcadores[0] or 0)
+                    total_homens += int(marcadores[1] or 0)
+                    total_mulheres += int(marcadores[2] or 0)
+                    total_criancas += int(marcadores[3] or 0)
+                except (ValueError, TypeError):
+                    continue
         
         return {
             'matriculas': total_matriculas,
@@ -609,7 +627,7 @@ def index():
     resumo = resumo_visitas()
 
     return render_template(
-        'index.html', totals=totals, resumo=resumo, trabalho=trabalho
+        'index.html', totals=totals, resumo=resumo
     )
 
 
