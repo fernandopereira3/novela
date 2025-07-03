@@ -94,6 +94,9 @@ def entrada_saida():
     form = PesquisaForm()
     sentenciados = db.sentenciados
     resultados = ""
+    
+    # Adicionar o resumo aqui
+    resumo = resumo_visitas()
 
     if form.validate_on_submit():
         matricula = form.matricula.data.strip()
@@ -102,7 +105,7 @@ def entrada_saida():
 
         if matricula:
             query['matricula'] = {
-                '$regex': f'^\\s*{re.escape(matricula)}\\s*$',
+                '$regex': f'^\\s*{re.escape(matricula)}\\s*',
                 '$options': 'i',
             }
         if nome:
@@ -111,8 +114,9 @@ def entrada_saida():
         resultados = construir_tabela(query=query, incluir_acoes=True)
 
     return render_template(
-        'entrada_saida.html', form=form, resultados=resultados
+        'entrada_saida.html', form=form, resultados=resultados, resumo=resumo
     )
+
 
 # ADICIONA VISITA AO BANCO DE DADOS
 @app.route('/adicionar/<matricula>', methods=['POST'])
@@ -452,18 +456,6 @@ def download_pdf():
     )
 
 def construir_tabela(documentos=None, query=None, incluir_acoes=True, classe_css="table table-striped"):
-    """
-    Função abstrata para construir tabela HTML de sentenciados
-    
-    Args:
-        documentos (list): Lista de documentos já processados (opcional)
-        query (dict): Query MongoDB para buscar documentos (opcional)
-        incluir_acoes (bool): Se deve incluir coluna de ações
-        classe_css (str): Classes CSS para a tabela
-    
-    Returns:
-        str: HTML da tabela ou mensagem de erro
-    """
     try:
         # Se não foram passados documentos, buscar no banco
         if documentos is None:
@@ -529,6 +521,7 @@ def construir_tabela(documentos=None, query=None, incluir_acoes=True, classe_css
     except Exception as e:
         print(f'Erro ao construir tabela: {e}')
         return f"<p class='alert alert-danger'>Erro ao processar dados: {e}</p>"
+
 
 
 def resumo_visitas():
@@ -600,6 +593,13 @@ def resumo_visitas():
             'total_visitantes': 0,
             'data_atual': datetime.datetime.now().strftime('%d/%m/%Y')
         }
+    
+@app.route('/api/resumo', methods=['GET'])
+def api_resumo():
+    """Retorna o resumo atual das visitas em formato JSON"""
+    resumo = resumo_visitas()
+    return jsonify(resumo)
+
 
 
 @app.route('/')

@@ -57,7 +57,7 @@
                 </li>
             </ul>       
             <ul>
-                <a href="/"><img src="{{ url_for('static', filename='img/penpol_logo.png') }}" class="rounded" alt="Logo"></a>
+                <a href="/"><img src="{{ url_for('static', filename='img/logo3.png') }}" class="rounded" alt="Logo"></a>
             </ul>
         </div>
     </nav>
@@ -71,30 +71,32 @@
                 <div class="col-2 form-floating">
                     <input type="text" class="form-control" id="matricula" 
                         placeholder="Matricula" name="matricula" 
-                        value="{{ form.matricula.data if form.matricula.data }}">
-                    <label for="matricula">{{ form.matricula.label }}</label>
+                        value="{{ form.matricula.data if form.matricula.data }}"
+                        style="height: 60px;">
+                    <label for="matricula" style="color: #000;">{{ form.matricula.label }}</label>
                 </div>
                 <div class="col form-floating">
                     <input type="text" class="form-control" id="nome" 
                         placeholder="Nome" name="nome" 
-                        value="{{ form.nome.data if form.nome.data }}">
-                    <label for="nome">{{ form.nome.label }}</label>   
+                        value="{{ form.nome.data if form.nome.data }}"
+                        style="height: 60px;">
+                    <label for="nome" style="color: #000;">{{ form.nome.label }}</label>   
                 </div>
             </div>
             <div class="d-flex gap-3">
                 <div class="col form-floating">
-                    <input type="text" class="form-control" id="visita" placeholder="Visitante" name="visita">
-                    <label for="visita">Nome do Visitante</label>
+                    <input type="text" class="form-control" id="visita" placeholder="Visitante" name="visita" style="height: 60px;">
+                    <label for="visita" style="color: #000;">Nome do Visitante</label>
                 </div>
                 <div class="col-3 form-floating">
-                    <select class="form-select" id="parentesco" name="parentesco">
+                    <select class="form-select" id="parentesco" name="parentesco" style="height: 60px;">
                         <option selected>Amasia</option>
                         <option value="Mae">Mae</option>
                         <option value="Pai">Pai</option>
                         <option value="Filho(a)">Filho(a)</option>
                         <option value="Esposa">Esposa</option>
                     </select>
-                    <label for="parentesco">Parentesco</label>
+                    <label for="parentesco" style="color: #000;">Parentesco</label>
                 </div>
             </div>
             <div><div class="d-flex gap-2">
