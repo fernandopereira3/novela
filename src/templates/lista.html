@@ -144,7 +144,7 @@
         <!-- LISTA -->
         <div class="container mt-4">
             {% if documentos %}
-            <table class="table table-striped" id="tabela_entrada">
+            <table class="table table-striped" id="tabela_entrada" style="border-radius: 10px">
                 <style>
                     .table-striped th{
                         text-align: center;
@@ -246,107 +246,152 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Função para atualizar o resumo sem recarregar a página
-        function atualizarResumo() {
-            fetch('/api/resumo')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('total-matriculas').textContent = data.matriculas;
-                    document.getElementById('total-garrafas').textContent = data.garrafas;
-                    document.getElementById('total-homens').textContent = data.homens;
-                    document.getElementById('total-mulheres').textContent = data.mulheres;
-                    document.getElementById('total-criancas').textContent = data.criancas;
-                    document.getElementById('total-visitantes').textContent = data.total_visitantes;
-                })
-                .catch(error => {
-                    console.error('Erro ao atualizar resumo:', error);
-                });
-        }
+ <script>
+// Função para atualizar o resumo sem recarregar a página
+function atualizarResumo() {
+    fetch('/api/resumo')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-matriculas').textContent = data.matriculas;
+            document.getElementById('total-garrafas').textContent = data.garrafas;
+            document.getElementById('total-homens').textContent = data.homens;
+            document.getElementById('total-mulheres').textContent = data.mulheres;
+            document.getElementById('total-criancas').textContent = data.criancas;
+            document.getElementById('total-visitantes').textContent = data.total_visitantes;
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar resumo:', error);
+        });
+}
 
-        function editarMarcadores(matricula, nome, garrafas, homens, mulheres, criancas) {
-            console.log('Dados recebidos:', {matricula, nome, garrafas, homens, mulheres, criancas});
-            
-            // Converter strings para números se necessário
-            garrafas = parseInt(garrafas) || 0;
-            homens = parseInt(homens) || 0;
-            mulheres = parseInt(mulheres) || 0;
-            criancas = parseInt(criancas) || 0;
-            
-            // Preencher o modal com os dados atuais
-            document.getElementById('editMatricula').value = matricula;
-            document.getElementById('editNome').textContent = nome;
-            document.getElementById('editGarrafas').value = garrafas;
-            document.getElementById('editHomens').value = homens;
-            document.getElementById('editMulheres').value = mulheres;
-            document.getElementById('editCriancas').value = criancas;
+function editarMarcadores(matricula, nome, garrafas, homens, mulheres, criancas) {
+    // Converter strings para números se necessário
+    garrafas = parseInt(garrafas) || 0;
+    homens = parseInt(homens) || 0;
+    mulheres = parseInt(mulheres) || 0;
+    criancas = parseInt(criancas) || 0;
+    
+    // Preencher o modal com os dados atuais
+    document.getElementById('editMatricula').value = matricula;
+    document.getElementById('editNome').textContent = nome;
+    document.getElementById('editGarrafas').value = garrafas;
+    document.getElementById('editHomens').value = homens;
+    document.getElementById('editMulheres').value = mulheres;
+    document.getElementById('editCriancas').value = criancas;
 
-            // Mostrar o modal
-            const modal = new bootstrap.Modal(document.getElementById('editarModal'));
-            modal.show();
-        }
+    // Mostrar o modal
+    const modal = new bootstrap.Modal(document.getElementById('editarModal'));
+    modal.show();
+}
 
-        function salvarMarcadores() {
-            const matricula = document.getElementById('editMatricula').value;
-            const garrafas = parseInt(document.getElementById('editGarrafas').value) || 0;
-            const homens = parseInt(document.getElementById('editHomens').value) || 0;
-            const mulheres = parseInt(document.getElementById('editMulheres').value) || 0;
-            const criancas = parseInt(document.getElementById('editCriancas').value) || 0;
-
-            fetch(`/editar_marcadores/${matricula}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    garrafas: garrafas,
-                    homens: homens,
-                    mulheres: mulheres,
-                    criancas: criancas
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Atualizar a tabela com os novos valores
-                        document.getElementById(`garrafas-${matricula}`).textContent = garrafas;
-                        document.getElementById(`homens-${matricula}`).textContent = homens;
-                        document.getElementById(`mulheres-${matricula}`).textContent = mulheres;
-                        document.getElementById(`criancas-${matricula}`).textContent = criancas;
-
-                        // Fechar o modal
-                        bootstrap.Modal.getInstance(document.getElementById('editarModal')).hide();
-                        alert(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Erro ao salvar marcadores');
-                    console.error('Error:', error);
-                });
-        }
-
-        function removerVisita(matricula) {
-                fetch(`/remover_visita_hoje/${matricula}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            document.getElementById(`row-${matricula}`).remove();
-                            alert(data.message);
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Erro ao remover visita');
-                        console.error('Error:', error);
+function atualizarTabela() {
+    fetch('/api/lista_dados')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const tbody = document.querySelector('#tabela_entrada tbody');
+                if (tbody) {
+                    // Limpar tbody atual
+                    tbody.innerHTML = '';
+                    
+                    // Adicionar novas linhas
+                    data.documentos.forEach(doc => {
+                        const row = `
+                            <tr id="row-${doc.matricula}">
+                                <td>${doc.matricula}</td>
+                                <td>${doc.nome}</td>
+                                <td id="garrafas-${doc.matricula}">${doc.garrafas}</td>
+                                <td id="homens-${doc.matricula}">${doc.homens}</td>
+                                <td id="mulheres-${doc.matricula}">${doc.mulheres}</td>
+                                <td id="criancas-${doc.matricula}">${doc.criancas}</td>
+                                <td>${doc.pavilhao || ''}</td>
+                                <td>${doc.data_visita}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning me-1"
+                                        onclick="editarMarcadores('${doc.matricula}', '${doc.nome}', '${doc.garrafas}', '${doc.homens}', '${doc.mulheres}', '${doc.criancas}')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="removerVisita('${doc.matricula}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
                     });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar tabela:', error);
+        });
+}
+
+function salvarMarcadores() {
+    const matricula = document.getElementById('editMatricula').value;
+    const garrafas = parseInt(document.getElementById('editGarrafas').value) || 0;
+    const homens = parseInt(document.getElementById('editHomens').value) || 0;
+    const mulheres = parseInt(document.getElementById('editMulheres').value) || 0;
+    const criancas = parseInt(document.getElementById('editCriancas').value) || 0;
+
+    fetch(`/editar_marcadores/${matricula}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            garrafas: garrafas,
+            homens: homens,
+            mulheres: mulheres,
+            criancas: criancas
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('editarModal')).hide();
+            
+            // Mostrar mensagem pedindo para atualizar
+            alert('Dados salvos com sucesso! Pressione F5 para ver as alterações na tabela.');
+        } else {
+            alert('Erro: ' + data.message);
         }
-    </script>
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao salvar');
+    });
+}
+
+
+
+
+
+
+function removerVisita(matricula) {
+    fetch(`/remover_visita_hoje/${matricula}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById(`row-${matricula}`).remove();
+            // Atualizar o resumo após remover
+            atualizarResumo();
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        alert('Erro ao remover visita');
+        console.error('Error:', error);
+    });
+}
+</script>
+
+
 
 
     <!-- Footer -->
