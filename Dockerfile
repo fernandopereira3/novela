@@ -11,7 +11,9 @@ RUN cd /novela
 RUN python3 -m venv .
 RUN python3 -m pip install -r requirements.txt
 
+EXPOSE  5000
+
 # Run the application
-CMD ["python3", "main.py"]
+CMD ["python3", "src/main.py"]
 
 

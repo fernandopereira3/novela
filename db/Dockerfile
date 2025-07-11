@@ -1,12 +1,13 @@
-FROM mongo:latest
-#FROM fedora:latest
+# Use a specific version for reproducibility
+FROM mongo:5.0
 
-WORKDIR /db
+# Copy the CSV and the import script to the initialization directory
+COPY db.csv /docker-entrypoint-initdb.d/
+COPY import.sh /docker-entrypoint-initdb.d/
 
-COPY . .
+# Make the import script executable
+RUN chmod +x /docker-entrypoint-initdb.d/import.sh
 
-RUN cd /db
-#CMD [ "mongoimport", "--db=cpppac", "--collection=sentenciados", "--type=csv", "--file=db.csv", "--headerline"]
-
+# Expose the default MongoDB port
 EXPOSE 27017
 
