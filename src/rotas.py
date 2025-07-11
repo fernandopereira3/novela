@@ -621,9 +621,7 @@ def construir_tabela(
                 if incluir_acoes:
                     acoes_cell = f"""
                         <td>
-                            <button class="btn btn-sm btn-primary" onclick="selecionarSentenciado('{matricula}', '{nome}')">
-                                Selecionar
-                            </button>
+                            
                         </td>
                     """
 
