@@ -1,10 +1,7 @@
-version: '3'
-
 services:
   app:
-    image: fedora:latest
-    container_name: app-novela
     build: .
+    container_name: app-novela
     ports:
       - "5000:5000"
     environment:
@@ -18,11 +15,12 @@ services:
     image: mongo:latest
     container_name: db-novela
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
-      - /db:/db
+      - mongodb_data:/data/db
     restart: always
-
+    networks:
+      - app-network
 
 volumes:
   mongodb_data:
