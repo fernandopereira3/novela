@@ -1,5 +1,16 @@
-from flask import render_template, flash
-from main import *
+from flask import render_template
+
+# Importar diretamente as instâncias app e db
+try:
+    from main import app, db
+except ImportError:
+    # Fallback para quando executado de fora do diretório src
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
+    from main import app, db
 
 
 # Armazenamento em cache simples

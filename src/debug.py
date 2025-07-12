@@ -1,17 +1,26 @@
 import pandas as pd
-from main import app, db
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 import json
 from bson import json_util
-from trabalho import *
-from rotas import *
+
+# Importar diretamente as instâncias app e db
+try:
+    from main import app, db
+except ImportError:
+    # Fallback para quando executado de fora do diretório src
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
+    from main import app, db
 
 
 @app.route('/debug', methods=['GET'])
 def debug_trabalho():
     """Rota de debug para visualizar detalhes do DataFrame df_trabalho"""
     try:
-        # Tentativa de acessar df_trabalho do escopo global
+        # Importação local para evitar importação circular
         from rotas import df_lista_sentenciados
 
         # [código existente para coletar informações]

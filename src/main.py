@@ -1,29 +1,33 @@
-from flask import Flask
 import os
-from flask_pymongo import PyMongo
-from flask_wtf import FlaskForm
+import sys
+from flask import Flask
 
 
+# Adiciona o diretório pai ao path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+# Adiciona o diretório atual (src) ao path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+from db.connection import connection
 
 app = Flask(__name__, instance_relative_config=True)
-#app.config['MONGO_URI'] = os.getenv('MONGODB_URI', 'mongodb://db-novela:27017/cpppac')
-app.config['MONGO_URI'] = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/cpppac')
-app.config['SECRET_KEY'] = os.urandom(32)
+db = connection()
 
-# Inicializa o PyMongo corretamente
-try:
-    mongo = PyMongo(app)
-    db = mongo.db
-    mongo.db.command('ping')
-    print(f'🔌Conectado ao MongoDB com sucesso!')
-except Exception as e:
-    print(f'Erro ao conectar ao MongoDB: {e}')
-    exit(1)
+secret_key = os.urandom(24)
+app.config['SECRET_KEY'] = secret_key
 
+# Importar módulos para registrar as rotas
+from rotas import *
+from  rotas_saida import *
+from jumbo import *
+from trabalho import *
+from user import *
+from functions import *
 
 if __name__ == '__main__':
-    from rotas import *
-    from rotas_saida import *
-    from jumbo import *
-    from user import *
     app.run(host='0.0.0.0', port=5000, debug=True)

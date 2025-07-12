@@ -1,6 +1,15 @@
-from main import app, db
-from flask import render_template, redirect, url_for, request, session, flash
-from werkzeug.security import check_password_hash
+# Importar diretamente as instâncias app e db
+try:
+    from main import app, db
+except ImportError:
+    # Fallback para quando executado de fora do diretório src
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
+    from main import app, db
+from flask import render_template, redirect, url_for, request, session
 
 
 ## LOGIN ##
