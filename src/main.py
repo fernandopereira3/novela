@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 
 app = Flask(__name__, instance_relative_config=True)
-app.config['MONGO_URI'] = os.getenv('MONGODB_URI', 'mongodb://db-novela:27017/cpppac')
+app.config['MONGO_URI'] = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/cpppac')
 app.config['SECRET_KEY'] = os.urandom(32)
 
 # Inicializa o PyMongo corretamente
@@ -13,7 +13,7 @@ try:
     mongo = PyMongo(app)
     db = mongo.db
     mongo.db.command('ping')
-    print('Conectado ao MongoDB com sucesso!')
+    print(f'🔌Conectado ao MongoDB com sucesso!')
 except Exception as e:
     print(f'Erro ao conectar ao MongoDB: {e}')
     exit(1)

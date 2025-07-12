@@ -32,7 +32,6 @@ df_lista_sentenciados = pd.DataFrame(
         'data_adicao',
     ]
 )
-## app.secret_key = ''
 
 
 @app.route('/pesquisa', methods=['GET', 'POST'])
