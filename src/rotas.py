@@ -17,7 +17,8 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from main import app, db, PesquisaForm
+from main import app, db
+from functions.functions import PesquisaForm
 from flask import render_template, request, redirect, url_for, session, flash
 from debug import *
 

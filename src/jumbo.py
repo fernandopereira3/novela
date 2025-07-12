@@ -1,4 +1,5 @@
-from main import app, db, PesquisaForm
+from main import app, db
+from functions.functions import PesquisaForm
 import pandas as pd
 from flask import (
     render_template,

@@ -2,12 +2,12 @@ from flask import render_template, jsonify, request, flash, redirect, url_for
 import pandas as pd
 import datetime
 import io
-from main import app, db  # Make sure to import db from main
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from flask import send_file
+from main import app, db 
 
 # Create a global DataFrame to store the data
 df_lista_saida = pd.DataFrame(
