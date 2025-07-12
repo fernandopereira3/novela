@@ -1,3 +1,5 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -107,6 +109,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env
 .venv
 env/
 venv/
@@ -136,4 +139,3 @@ dmypy.json
 *lib64*
 *cript*
 *cripts*
-.DS_Store

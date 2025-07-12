@@ -1,35 +1,28 @@
-##Start-Process -FilePath "python" -ArgumentList "D:\repositorios-github\novela\main.py" -WindowStyle Hidden
-
 $ErrorActionPreference = "Stop"
 
-
-Write-Host "Initializing novela environment..." -ForegroundColor Green
+Write-Host "Inicializando ambiente..." -ForegroundColor Green
 
 try {
-    $pythonVersion = python --version
-    Write-Host "Python nao encontrado: $pythonVersion" -ForegroundColor Green
+    python --version | Out-Null
 } catch {
-    Write-Host "Python is not installed or not in PATH. Please install Python first." -ForegroundColor Red
-    exit 
+    Write-Host "Python não instalado ou não está no PATH." -ForegroundColor Red
+    exit 1
 }
 
-if (-not (Test-Path "\Lib")) {
-    Write-Host "Criando ambiente virtual..." -ForegroundColor Yellow
-    python -m venv .
-} else {
-    Write-Host "Ambiente virtual já existe." -ForegroundColor Green
+if (-not (Test-Path ".\Lib")) {
+    Write-Host "Criando venv..." -ForegroundColor Yellow
+    python -m venv .venv
 }
 
-Write-Host "Activating virtual environment..." -ForegroundColor Yellow
-& .\Scripts\Activate.ps1
+& .\.venv\Scripts\Activate.ps1
 
 if (Test-Path ".\requirements.txt") {
-    Write-Host "Installing dependencies..." -ForegroundColor Yellow
+    Write-Host "Instalando dependências..." -ForegroundColor Yellow
     pip install -r requirements.txt
 }
 
-Write-Host "Starting novela application..." -ForegroundColor Green
-Start-Process -FilePath "python" -ArgumentList "C:\novela-main\src\main.py" -WindowStyle Hidden
+Write-Host "Iniciando aplicação..." -ForegroundColor Green
+Start-Process -FilePath "python" -ArgumentList "D:\repositorios-github\novela\src\main.py" -WindowStyle Hidden
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Application exited with code $LASTEXITCODE" -ForegroundColor Red
