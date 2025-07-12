@@ -1,4 +1,3 @@
-# Importar diretamente as instâncias app e db
 try:
     from main import app, db
 except ImportError:
@@ -9,6 +8,7 @@ except ImportError:
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
     from main import app, db
+###################################################################
 from functions.functions import PesquisaForm
 import pandas as pd
 from flask import (
@@ -24,6 +24,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from io import BytesIO
 import datetime
+
 
 # Create DataFrame for daily visits with proper datetime type
 df_visitas = pd.DataFrame(
@@ -52,7 +53,7 @@ def jumbo():
                 flash('Lista diária limpa com sucesso', 'success')
                 return redirect(url_for('jumbo'))
 
-        today = datetime.now().date()
+        today = datetime.datetime.now().date()
         if not df_visitas.empty:
             df_visitas = df_visitas[
                 pd.to_datetime(df_visitas['data_visita']).dt.date == today
