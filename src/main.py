@@ -13,10 +13,11 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-from db.connection import connection
+from Data.conexao import conexao
+db = conexao()
 
 app = Flask(__name__, instance_relative_config=True)
-db = connection()
+
 
 secret_key = os.urandom(24)
 app.config['SECRET_KEY'] = secret_key

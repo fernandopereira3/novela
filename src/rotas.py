@@ -18,10 +18,13 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from functions.functions import PesquisaForm, construir_tabela, resumo_visitas
+from Data.conexao import conexao
+db = conexao()
+
 
 # Importar diretamente as instâncias app e db
 try:
-    from main import app, db
+    from main import app
 except ImportError:
     # Fallback para quando executado de fora do diretório src
     import sys
@@ -29,7 +32,7 @@ except ImportError:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
-    from main import app, db
+    from main import app
 
 df_lista_sentenciados = pd.DataFrame(
     columns=[

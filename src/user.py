@@ -1,6 +1,6 @@
 # Importar diretamente as instâncias app e db
 try:
-    from main import app, db
+    from main import app
 except ImportError:
     # Fallback para quando executado de fora do diretório src
     import sys
@@ -8,9 +8,10 @@ except ImportError:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     if current_dir not in sys.path:
         sys.path.insert(0, current_dir)
-    from main import app, db
+    from main import app
 from flask import render_template, redirect, url_for, request, session
-
+from Data.conexao import conexao
+db = conexao()
 
 ## LOGIN ##
 @app.route('/login', methods=['GET', 'POST'])

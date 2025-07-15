@@ -1,9 +1,8 @@
 from flask_wtf import FlaskForm
 import datetime
 from wtforms import StringField, SubmitField
-from db.connection import connection
-db = connection()
-
+from Data.conexao import conexao
+db = conexao()
 
 class PesquisaForm(FlaskForm):
     matricula = StringField('Matrícula')
