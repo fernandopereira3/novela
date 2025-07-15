@@ -1,3 +1,5 @@
+import os
+from flask import Flask
 from flask_wtf import FlaskForm
 import datetime
 from wtforms import StringField, SubmitField
@@ -12,7 +14,6 @@ class PesquisaForm(FlaskForm):
     mulheres = StringField('Mulheres')
     criancas = StringField('Crianças')
     pesquisar = SubmitField('PESQUISAR')
-
 
 
 def construir_tabela(
