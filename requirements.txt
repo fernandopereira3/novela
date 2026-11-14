@@ -2,7 +2,7 @@ annotated-types==0.7.0
 blinker==1.9.0
 chardet==5.2.0
 click==8.2.1
-dnspython>=2.9.0
+dnspython>=2.9.2
 Flask==3.1.1
 Flask-PyMongo==3.0.1
 Flask-WTF==1.2.2
